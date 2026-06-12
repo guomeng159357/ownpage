@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>将 Codex 融入日常办公 — 从入门到精通</title>
+    <meta name="description" content="从零开始，逐步把 Codex 变成你的得力办公助手。涵盖晨间简报、文件整理、PPT 生成、数据分析等实战场景，附完整学习路径。">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../css/custom.css">
+    <style>
+        .article-page { max-width: 860px; margin: 0 auto; padding: 40px 24px 80px; }
+        .article-page .back-link {
+            display: inline-flex; align-items: center; gap: 6px;
+            color: var(--muted); text-decoration: none; font-size: 14px;
+            margin-bottom: 32px; transition: color .2s;
+        }
+        .article-page .back-link:hover { color: var(--accent); }
+
+        .article-header {
+            margin-bottom: 40px; padding-bottom: 32px;
+            border-bottom: 1px solid var(--line);
+        }
+        .article-header .article-badge {
+            display: inline-block; font-size: 12px; font-weight: 600;
+            color: var(--accent); background: rgba(191,162,103,0.12);
+            padding: 4px 12px; border-radius: 999px; margin-bottom: 12px; letter-spacing: .04em;
+        }
+        .article-header h1 {
+            font-family: var(--font-heading);
+            font-size: clamp(28px, 5vw, 40px); font-weight: 700;
+            color: var(--text); margin: 12px 0 16px;
+            line-height: 1.25; letter-spacing: -.01em;
+        }
+        .article-header .article-summary {
+            font-size: 17px; color: var(--muted); line-height: 1.7; max-width: 680px;
+        }
+
+        .article-body h2 {
+            font-family: var(--font-heading); font-size: 22px; font-weight: 600;
+            color: var(--accent); margin: 48px 0 16px; padding-top: 8px; letter-spacing: -.01em;
+        }
+        .article-body h3 {
+            font-family: var(--font-heading); font-size: 18px; font-weight: 600;
+            color: var(--text); margin: 32px 0 12px;
+        }
+        .article-body h4 {
+            font-family: var(--font-heading); font-size: 15px; font-weight: 600;
+            color: var(--soft); margin: 24px 0 8px;
+        }
+        .article-body p { color: var(--soft); line-height: 1.78; margin: 0 0 16px; }
+        .article-body ul, .article-body ol { color: var(--soft); line-height: 1.78; margin: 0 0 20px; padding-left: 20px; }
+        .article-body li { margin-bottom: 8px; }
+
+        .article-body code {
+            background: var(--surface); color: var(--accent);
+            padding: 2px 7px; border-radius: 4px;
+            font-family: "SF Mono", "Fira Code", monospace; font-size: .9em;
+        }
+        .article-body pre {
+            background: var(--bg-soft); border: 1px solid var(--line);
+            border-radius: var(--radius); padding: 16px 20px; overflow-x: auto;
+            font-size: 14px; line-height: 1.6; margin: 0 0 20px;
+            color: var(--soft);
+        }
+        .article-body pre code { background: none; padding: 0; color: var(--soft); }
+
+        .article-body strong { color: var(--text); }
+
+        .article-body .tip-box {
+            background: var(--surface); border-left: 3px solid var(--accent);
+            border-radius: 0 var(--radius) var(--radius) 0; padding: 16px 20px;
+            margin: 0 0 24px; color: var(--soft); font-size: 15px;
+        }
+        .article-body .tip-box strong { color: var(--accent); }
+
+        .article-body blockquote {
+            border-left: 2px solid var(--line); margin: 24px 0 16px;
+            padding: 4px 0 4px 16px; color: var(--muted); font-style: italic;
+        }
+
+        .article-footer {
+            margin-top: 56px; padding-top: 24px;
+            border-top: 1px solid var(--line); color: var(--muted); font-size: 14px;
+        }
+
+        @media (max-width: 640px) {
+            .article-page { padding: 24px 16px 56px; }
+            .article-header h1 { font-size: 24px; }
+            .article-body h2 { font-size: 19px; }
+        }
+    </style>
+</head>
+
+<body>
+    <span id="top" class="top-anchor" aria-hidden="true"></span>
+    <div class="page-shell">
+        <header class="site-header">
+            <a class="brand" href="../index.html" aria-label="回到主页">
+                <img src="../assets/avatar.jpg" alt="郭猛 Ammon" class="brand-avatar" width="34" height="34">
+                <span>郭猛 Ammon</span>
+            </a>
+            <nav class="desktop-nav" aria-label="主导航">
+                <a href="../index.html">主页</a>
+                <a href="../api-hub.html">API 聚合导航</a>
+                <a href="../index.html#ai-explore">AI 探索</a>
+                <a href="../index.html#articles">文章分享</a>
+            </nav>
+            <div class="header-actions">
+                <button class="menu-toggle" type="button" data-menu-toggle aria-label="打开菜单" aria-controls="mobile-menu"
+                    aria-expanded="false">
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </header>
+
+        <div class="mobile-menu" id="mobile-menu" data-mobile-menu>
+            <a href="../index.html">主页</a>
+            <a href="../api-hub.html">API 聚合导航</a>
+            <a href="../index.html#ai-explore">AI 探索</a>
+            <a href="../index.html#articles">文章分享</a>
+        </div>
+
+        <main>
+            <article class="article-page">
+                <a class="back-link" href="../index.html#articles">← 返回文章分享</a>
+
+                <div class="article-header">
+                    <span class="article-badge">效率提升 · 实战指南</span>
+                    <h1>将 Codex 融入日常办公：从入门到精通</h1>
+                    <p class="article-summary">
+                        从零开始，逐步把 Codex 变成你的得力办公助手。涵盖晨间简报、文件整理、PPT 生成、数据分析等实战场景，附完整学习路径。
+                    </p>
+                </div>
+
+                <div class="article-body">
+
+                    <p>
+                        将 Codex 融入日常办公，最有效的方式是从一个你每天都会做的、<strong>具体且重复的工作场景</strong>开始，比如处理邮件、整理文件或撰写周报。不要一开始就想解决大问题，而是专注于让一个小任务变得更轻松。
+                    </p>
+                    <p>
+                        下面这条从易到难的学习路径，能帮你轻松上手，逐步把 Codex 变成你的得力办公助手。
+                    </p>
+
+                    <!-- ===== 阶段一 ===== -->
+                    <h2>🚀 阶段一：从零开始，完成你的第一个自动化任务</h2>
+                    <p>预计时间：<strong>1 小时内</strong>。目标是跑通流程，建立信心。</p>
+
+                    <h3>场景一：让"晨间简报"成为你的 AI 秘书（入门首选）</h3>
+                    <p>许多信息工作者每天早上的第一件事，就是"搞清楚今天要干什么"。这正是学习使用 Codex 最完美的切入点。</p>
+
+                    <h4>Level 1 — 信息汇总</h4>
+                    <p>创建一条新对话，直接输入指令。Codex 会自动连接你的日历、邮件和通讯软件。</p>
+                    <pre><code>连接我的 Calendar、Gmail 和 Slack，告诉我今天有哪些会议、待回复的邮件和未读的重要信息。</code></pre>
+
+                    <h4>Level 2 — 固定格式</h4>
+                    <p>当信息汇总变得有用后，你可以把偏好固定下来，避免每次重复说明。告诉 Codex：</p>
+                    <pre><code>把今天的汇总格式保存到我的 AGENTS.md 文件里，以后每次都用这个格式。</code></pre>
+
+                    <h3>场景二：整理杂乱的"下载文件夹"</h3>
+                    <p>这是最直观、最能立即见效的办公任务。</p>
+                    <p>在 Codex 桌面应用中，将你杂乱的"下载"文件夹添加为一个<strong>"项目"</strong>。然后在对话中输入：</p>
+                    <pre><code>帮我把当前目录下的文件按类型整理到不同文件夹里：图片放 images，文档放 docs，压缩包放 archives，其他放 others。</code></pre>
+
+                    <div class="tip-box">
+                        <strong>💡 学习要点：</strong>通过这个任务，你会理解 Codex 的"项目"概念——它不是一个聊天窗口，而是能真正操作你电脑上文件和文件夹的代理。
+                    </div>
+
+                    <!-- ===== 阶段二 ===== -->
+                    <h2>📈 阶段二：掌握核心技能，让协作更高效</h2>
+                    <p>预计时间：<strong>半天到一天</strong>。在体验过基础任务后，学习以下核心技能能让你事半功倍。</p>
+
+                    <h3>学会"先计划，后执行"</h3>
+                    <p>对于稍复杂的任务（如制作 PPT 或分析表格），先让 Codex 给出方案，可以极大避免无效返工。</p>
+                    <pre><code>我想做一份关于 Q2 销售数据的分析报告，先不要动代码。请给我一个数据清洗、分析和可视化的三步计划，我确认后再开始。</code></pre>
+
+                    <h3>建立你的"项目宪法" AGENTS.md</h3>
+                    <p>这是与 Codex 沟通的关键。在项目文件夹根目录创建一个 <code>AGENTS.md</code> 文件，把你反复交代的规则写进去，比如"使用中文回复"、"代码注释用英文"、"图表风格用'蓝白商务风'"。这样，Codex 就会自动遵守你的个人习惯。</p>
+
+                    <h3>巧用"计划模式"和"预览"</h3>
+                    <p>当你让 Codex 做网页、PPT 或报告时，在对话中输入 <code>/plan</code> 或手动开启"计划模式"。它会先给出详细实施方案等你确认，避免跑偏。对于网页、图表等可视化结果，可以使用内置的预览窗口。如果对布局不满意，直接用批注功能在页面上圈出来并写下意见，比用文字描述精准得多。</p>
+
+                    <!-- ===== 阶段三 ===== -->
+                    <h2>💼 阶段三：解锁办公进阶场景，成为效率高手</h2>
+                    <p>当你掌握了基础操作，就可以用 Codex 来应对更复杂的办公挑战了。</p>
+
+                    <h3>场景一：AI 一键生成专业 PPT</h3>
+                    <p>这是最受欢迎的办公功能之一。利用 <code>$$slides</code> 技能，Codex 能直接生成可编辑的 <code>.pptx</code> 文件。</p>
+                    <pre><code>使用 $$slides 技能，帮我创建一个蓝色风格、白色底的PPT，主题是"2026下半年市场策略"，大纲包括：市场回顾、核心挑战、策略规划、预算预估。总页数控制在8页。</code></pre>
+
+                    <h3>场景二：自动化处理数据与制作报告</h3>
+                    <p>无论是分析销售数据还是做市场调研，Codex 都能完成从数据清洗到生成可视化报告的全流程。</p>
+                    <pre><code>请分析我提供的"销售数据.csv"文件。1. 清洗数据，去除无效条目。2. 分析各产品线的季度销售趋势。3. 生成一份包含柱状图和趋势线的 HTML 可视化报告。</code></pre>
+
+                    <h3>场景三：用 @Computer 控制电脑完成任务（Beta）</h3>
+                    <p>这是更进阶的玩法，让 Codex 像人一样操作你的电脑界面，适合跨应用的复杂任务。</p>
+                    <pre><code>@Computer 请帮我把桌面上的「会议笔记.txt」里的待办事项，添加到我的飞书"今日待办"清单里。</code></pre>
+                    <div class="tip-box">
+                        <strong>💡 使用提示：</strong>首次使用需要在 Codex 应用中开启 Computer Use 功能，并在指令前加上 <code>@Computer</code>。
+                    </div>
+
+                    <!-- ===== 进阶心法 ===== -->
+                    <h2>💡 进阶心法：让它成为你的"虚拟员工"</h2>
+                    <p>当你熟练之后，可以像 OpenAI 的专家一样，将 Codex 提升到"虚拟员工"的层次。</p>
+
+                    <h3>给一个长期目标 /goal</h3>
+                    <p>对于周期较长的任务，比如"分析这个月的客户反馈邮件，总结出 3 个主要痛点，并生成一份改进建议报告"，使用 <code>/goal</code> 模式，Codex 会像一个项目经理一样，自己规划步骤并持续工作直到完成。</p>
+
+                    <h3>让它拥有"长期记忆"</h3>
+                    <p>用本地文件夹（如 Obsidian 知识库）来存放项目文档、会议记录和 TODO 清单，并在 <code>AGENTS.md</code> 中告诉 Codex 每次执行任务前先去读取这些文件。这样，它能记住项目的来龙去脉，变得越来越"懂你"。</p>
+
+                    <h3>开启"自动化"</h3>
+                    <p>打开 Codex 的"自动化"面板，把你觉得有用且重复的任务设置成定时执行。例如，设置一个<strong>"每个工作日上午 9 点，自动整理昨天的项目文件并生成进度摘要"</strong>。</p>
+
+                    <!-- ===== 持续学习 ===== -->
+                    <h2>📚 持续学习与资源</h2>
+                    <ul>
+                        <li><strong>从模仿开始：</strong>不用担心写不出完美的指令。先去 OpenAI 官网看看他们提供的真实世界用例，这些是最好的学习模板。</li>
+                        <li><strong>遵循小步快跑：</strong>始终遵循"只调研 → 单文件改动 → 小任务修复 → 修复+验证 → 多文件改动"的阶梯，逐步建立你对工具的信任和掌控力。</li>
+                    </ul>
+
+                    <blockquote>
+                        纸上得来终觉浅，自己动手跑一遍才是学习 Codex 最快的方式。你可以先从"整理桌面"或"生成一份晨间简报"开始，相信你会很快感受到它的魅力。
+                    </blockquote>
+
+                </div>
+
+                <div class="article-footer">
+                    <p>© 2026 郭猛 Ammon · 个人主页 · <a href="../index.html#articles" style="color:var(--accent);">返回文章分享</a></p>
+                </div>
+            </article>
+        </main>
+
+        <footer class="site-footer section">
+            <span>郭猛 Ammon</span>
+            <a href="#top">回到顶部</a>
+        </footer>
+    </div>
+
+    <script>history.scrollRestoration = 'manual';</script>
+    <script>
+        document.querySelector('[data-menu-toggle]')?.addEventListener('click', function (e) {
+            const open = document.body.classList.toggle('menu-open');
+            document.querySelector('[data-mobile-menu]')?.classList.toggle('active', open);
+            e.currentTarget.setAttribute('aria-expanded', String(open));
+            e.currentTarget.setAttribute('aria-label', open ? '关闭菜单' : '打开菜单');
+        });
+        document.querySelectorAll('#mobile-menu a').forEach(l => {
+            l.addEventListener('click', () => {
+                document.body.classList.remove('menu-open');
+                document.querySelector('[data-mobile-menu]')?.classList.remove('active');
+                const b = document.querySelector('[data-menu-toggle]');
+                if (b) { b.setAttribute('aria-expanded', 'false'); b.setAttribute('aria-label', '打开菜单'); }
+            });
+        });
+    </script>
+</body>
+
+</html>

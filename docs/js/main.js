@@ -133,6 +133,22 @@ const CONTENT = {
 
     articles: [
         {
+            date: '2026.06',
+            title: 'Codex + Obsidian + LLM Wiki：搭建本地 AI 知识库',
+            summary: '保姆级教程：手把手教你用 Codex + Obsidian + LLM Wiki 把电脑搭成一个本地 AI 知识库，实现知识管理与 AI 深度融合，含 15 张详细截图。',
+            content: [],
+            link: 'articles/codex-obsidian-wiki.html',
+            external: true
+        },
+        {
+            date: '2026.06',
+            title: '将 Codex 融入日常办公：从入门到精通',
+            summary: '从零开始，逐步把 Codex 变成你的得力办公助手。涵盖晨间简报、文件整理、PPT 生成、数据分析等实战场景，附完整学习路径。',
+            content: [],
+            link: 'articles/codex-office-guide.html',
+            external: true
+        },
+        {
             date: '2025.06',
             title: 'Codex Desktop 安装与 DeepSeek 接入手册',
             summary: '详细介绍 Codex Desktop 的下载安装、配置流程，以及如何接入 DeepSeek 大模型 API，包含完整的图文步骤说明，适合初次配置的用户参考。',

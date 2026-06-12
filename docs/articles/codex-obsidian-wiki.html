@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Codex + Obsidian + LLM Wiki：搭建本地 AI 知识库</title>
+    <meta name="description" content="保姆级教程：手把手教你用 Codex + Obsidian + LLM Wiki 把电脑搭成一个本地 AI 知识库，实现知识管理与 AI 深度融合。">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../css/custom.css">
+    <style>
+        .article-page { max-width: 860px; margin: 0 auto; padding: 40px 24px 80px; }
+        .article-page .back-link {
+            display: inline-flex; align-items: center; gap: 6px;
+            color: var(--muted); text-decoration: none; font-size: 14px;
+            margin-bottom: 32px; transition: color .2s;
+        }
+        .article-page .back-link:hover { color: var(--accent); }
+
+        .article-header {
+            margin-bottom: 40px; padding-bottom: 32px;
+            border-bottom: 1px solid var(--line);
+        }
+        .article-header .article-badge {
+            display: inline-block; font-size: 12px; font-weight: 600;
+            color: var(--accent); background: rgba(191,162,103,0.12);
+            padding: 4px 12px; border-radius: 999px; margin-bottom: 12px; letter-spacing: .04em;
+        }
+        .article-header h1 {
+            font-family: var(--font-heading);
+            font-size: clamp(28px, 5vw, 40px); font-weight: 700;
+            color: var(--text); margin: 12px 0 16px;
+            line-height: 1.25; letter-spacing: -.01em;
+        }
+        .article-header .article-summary {
+            font-size: 17px; color: var(--muted); line-height: 1.7; max-width: 680px;
+        }
+
+        .article-body h2 {
+            font-family: var(--font-heading); font-size: 22px; font-weight: 600;
+            color: var(--accent); margin: 48px 0 16px; padding-top: 8px; letter-spacing: -.01em;
+        }
+        .article-body h3 {
+            font-family: var(--font-heading); font-size: 18px; font-weight: 600;
+            color: var(--text); margin: 32px 0 12px;
+        }
+        .article-body p { color: var(--soft); line-height: 1.78; margin: 0 0 16px; }
+        .article-body ul, .article-body ol { color: var(--soft); line-height: 1.78; margin: 0 0 20px; padding-left: 20px; }
+        .article-body li { margin-bottom: 8px; }
+        .article-body code {
+            background: var(--surface); color: var(--accent);
+            padding: 2px 7px; border-radius: 4px;
+            font-family: "SF Mono", "Fira Code", monospace; font-size: .9em;
+        }
+        .article-body pre {
+            background: var(--bg-soft); border: 1px solid var(--line);
+            border-radius: var(--radius); padding: 16px 20px; overflow-x: auto;
+            font-size: 14px; line-height: 1.6; margin: 0 0 20px;
+            color: var(--soft);
+        }
+        .article-body pre code { background: none; padding: 0; color: var(--soft); }
+        .article-body strong { color: var(--text); }
+
+        .article-body figure {
+            margin: 0 0 32px; border-radius: var(--radius);
+            overflow: hidden; border: 1px solid var(--line);
+            background: var(--bg-soft);
+        }
+        .article-body figure img { display: block; width: 100%; height: auto; }
+        .article-body figure figcaption {
+            padding: 10px 14px; font-size: 13px; color: var(--muted);
+            text-align: center; border-top: 1px solid var(--line);
+        }
+
+        .article-body .tip-box {
+            background: var(--surface); border-left: 3px solid var(--accent);
+            border-radius: 0 var(--radius) var(--radius) 0; padding: 16px 20px;
+            margin: 0 0 24px; color: var(--soft); font-size: 15px;
+        }
+        .article-body .tip-box strong { color: var(--accent); }
+
+        .article-footer {
+            margin-top: 56px; padding-top: 24px;
+            border-top: 1px solid var(--line); color: var(--muted); font-size: 14px;
+        }
+
+        @media (max-width: 640px) {
+            .article-page { padding: 24px 16px 56px; }
+            .article-header h1 { font-size: 24px; }
+            .article-body h2 { font-size: 19px; }
+        }
+    </style>
+</head>
+
+<body>
+    <span id="top" class="top-anchor" aria-hidden="true"></span>
+    <div class="page-shell">
+        <header class="site-header">
+            <a class="brand" href="../index.html" aria-label="回到主页">
+                <img src="../assets/avatar.jpg" alt="郭猛 Ammon" class="brand-avatar" width="34" height="34">
+                <span>郭猛 Ammon</span>
+            </a>
+            <nav class="desktop-nav" aria-label="主导航">
+                <a href="../index.html">主页</a>
+                <a href="../api-hub.html">API 聚合导航</a>
+                <a href="../index.html#ai-explore">AI 探索</a>
+                <a href="../index.html#articles">文章分享</a>
+            </nav>
+            <div class="header-actions">
+                <button class="menu-toggle" type="button" data-menu-toggle aria-label="打开菜单" aria-controls="mobile-menu"
+                    aria-expanded="false">
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </header>
+
+        <div class="mobile-menu" id="mobile-menu" data-mobile-menu>
+            <a href="../index.html">主页</a>
+            <a href="../api-hub.html">API 聚合导航</a>
+            <a href="../index.html#ai-explore">AI 探索</a>
+            <a href="../index.html#articles">文章分享</a>
+        </div>
+
+        <main>
+            <article class="article-page">
+                <a class="back-link" href="../index.html#articles">← 返回文章分享</a>
+
+                <div class="article-header">
+                    <span class="article-badge">知识管理 · 保姆级教程</span>
+                    <h1>Codex + Obsidian + LLM Wiki：搭建本地 AI 知识库</h1>
+                    <p class="article-summary">
+                        手把手教你用 Codex + Obsidian + LLM Wiki 把电脑搭成一个本地 AI 知识库，实现本地知识管理与 AI 的深度融合。
+                    </p>
+                </div>
+
+                <div class="article-body">
+
+                    <h2>一、为什么要搭建本地 AI 知识库</h2>
+                    <p>
+                        在日常工作中，我们积累了大量笔记、文档和资料，但它们往往是分散的，难以被高效检索和利用。
+                        通过 Codex + Obsidian + LLM Wiki 的组合，你可以将本地笔记变成<strong>一个可以通过自然语言对话来查询和整理的知识库</strong>。
+                    </p>
+                    <ul>
+                        <li><strong>完全本地化：</strong>数据不上云端，隐私安全可控</li>
+                        <li><strong>AI 赋能：</strong>通过 Codex 对话式交互，让 AI 帮你检索、总结和关联笔记</li>
+                        <li><strong>双向同步：</strong>Obsidian 笔记变更后，LLM Wiki 自动索引，AI 实时感知</li>
+                        <li><strong>零成本：</strong>所需软件全部免费或开源</li>
+                    </ul>
+
+                    <figure>
+                        <img src="images/codex-obsidian/page-01.jpg" alt="本地 AI 知识库概览" loading="lazy">
+                        <figcaption>图 1：本地 AI 知识库整体架构概览</figcaption>
+                    </figure>
+
+                    <h2>二、工具介绍</h2>
+                    <h3>Obsidian</h3>
+                    <p>
+                        一款强大的本地 Markdown 笔记工具，以本地文件夹为基础，支持双向链接、图谱视图和丰富的插件生态。
+                        所有笔记以 <code>.md</code> 纯文本文件存储在本地，是完全由你掌控的知识库。
+                    </p>
+                    <h3>LLM Wiki</h3>
+                    <p>
+                        一个 Obsidian 社区插件，能将你的 Obsidian 笔记库变成一个可以通过 AI 查询的 Wiki。
+                        它负责将本地笔记内容索引化，让 AI 能够高效地理解和检索你的知识。
+                    </p>
+                    <h3>Codex</h3>
+                    <p>
+                        作为 AI 编程助手，Codex 在这里扮演"对话界面"的角色。它可以直接连接到你的 Obsidian 知识库，
+                        接收你的自然语言指令，完成知识检索、总结、关联和创作等任务。
+                    </p>
+
+                    <figure>
+                        <img src="images/codex-obsidian/page-02.jpg" alt="工具功能介绍" loading="lazy">
+                        <figcaption>图 2：三大核心工具的功能介绍</figcaption>
+                    </figure>
+
+                    <h2>三、安装 Obsidian 并创建知识库</h2>
+                    <h3>3.1 下载安装 Obsidian</h3>
+                    <ol>
+                        <li>访问 Obsidian 官网 <code>https://obsidian.md</code> 下载对应平台版本</li>
+                        <li>安装并启动 Obsidian</li>
+                        <li>点击"创建新库"，选择一个本地文件夹作为知识库的存储位置</li>
+                        <li>给你的知识库命名（如"我的知识库"），点击创建</li>
+                    </ol>
+
+                    <h3>3.2 初始化你的知识库结构</h3>
+                    <p>建议创建以下基本目录结构：</p>
+                    <ul>
+                        <li><code>日记/</code> — 每日记录</li>
+                        <li><code>项目/</code> — 各项目文档</li>
+                        <li><code>学习/</code> — 学习笔记和资料</li>
+                        <li><code>参考/</code> — 参考资料和摘录</li>
+                        <li><code>模板/</code> — 笔记模板</li>
+                    </ul>
+
+                    <figure>
+                        <img src="images/codex-obsidian/page-03.jpg" alt="Obsidian 安装配置" loading="lazy">
+                        <figcaption>图 3：Obsidian 安装与知识库初始化配置</figcaption>
+                    </figure>
+
+                    <h2>四、安装配置 LLM Wiki 插件</h2>
+                    <h3>4.1 安装插件</h3>
+                    <ol>
+                        <li>打开 Obsidian → 设置 → 第三方插件 → 关闭安全模式</li>
+                        <li>点击"浏览"，搜索 <code>LLM Wiki</code></li>
+                        <li>找到后点击安装并启用</li>
+                    </ol>
+
+                    <h3>4.2 配置 LLM Wiki</h3>
+                    <ol>
+                        <li>在插件设置中，配置索引目录（通常选择整个知识库文件夹）</li>
+                        <li>选择嵌入模型（Embedding Model），建议使用本地方案以获得最佳隐私保护</li>
+                        <li>设置索引更新策略（推荐"文件变更时自动更新"）</li>
+                        <li>等待首次索引完成（根据笔记数量，可能需要几分钟）</li>
+                    </ol>
+
+                    <figure>
+                        <img src="images/codex-obsidian/page-04.jpg" alt="LLM Wiki 插件安装" loading="lazy">
+                        <figcaption>图 4：LLM Wiki 插件的安装与配置流程</figcaption>
+                    </figure>
+
+                    <figure>
+                        <img src="images/codex-obsidian/page-05.jpg" alt="LLM Wiki 配置详情" loading="lazy">
+                        <figcaption>图 5：LLM Wiki 插件详细配置选项</figcaption>
+                    </figure>
+
+                    <h2>五、连接 Codex 到你的知识库</h2>
+                    <h3>5.1 将知识库添加为 Codex 项目</h3>
+                    <ol>
+                        <li>打开 Codex 桌面应用</li>
+                        <li>点击"添加项目"，选择你的 Obsidian 知识库文件夹</li>
+                        <li>Codex 会自动识别该目录下的所有 <code>.md</code> 文件</li>
+                    </ol>
+
+                    <h3>5.2 配置 AGENTS.md</h3>
+                    <p>在知识库根目录创建 <code>AGENTS.md</code> 文件，告诉 Codex 如何与你的知识库交互：</p>
+                    <pre><code># AGENTS.md
+## 知识库规则
+- 这是一个 Obsidian 知识库，所有笔记以 Markdown 格式存储
+- 使用双向链接 [[笔记名]] 关联相关内容
+- 每次回答时，优先检索本知识库中的相关内容
+- 当有新的知识或想法时，帮我创建新的笔记文件
+- 使用中文回复</code></pre>
+
+                    <figure>
+                        <img src="images/codex-obsidian/page-06.jpg" alt="Codex 连接知识库" loading="lazy">
+                        <figcaption>图 6：将 Obsidian 知识库添加为 Codex 项目</figcaption>
+                    </figure>
+
+                    <figure>
+                        <img src="images/codex-obsidian/page-07.jpg" alt="AGENTS.md 配置" loading="lazy">
+                        <figcaption>图 7：配置 AGENTS.md 规则文件</figcaption>
+                    </figure>
+
+                    <h2>六、实战：用 AI 与你的知识库对话</h2>
+                    <p>一切配置就绪后，你就可以在 Codex 中用自然语言与你的知识库互动了。</p>
+
+                    <h3>场景一：知识检索</h3>
+                    <pre><code>在我笔记里，关于"系统设计"有哪些记录？帮我总结一下关键观点。</code></pre>
+
+                    <h3>场景二：笔记创建</h3>
+                    <pre><code>帮我创建一篇新笔记，总结今天关于微服务架构的学习内容，并链接到已有的"系统设计"笔记。</code></pre>
+
+                    <h3>场景三：知识关联</h3>
+                    <pre><code>扫描我的知识库，找出所有与"分布式系统"相关的笔记，并生成一个索引页面，用双向链接关联它们。</code></pre>
+
+                    <h3>场景四：深度研究</h3>
+                    <pre><code>基于我笔记中关于"RAG 检索增强生成"的内容，结合当前最新的行业实践，帮我写一份技术选型分析。</code></pre>
+
+                    <figure>
+                        <img src="images/codex-obsidian/page-08.jpg" alt="实战场景演示" loading="lazy">
+                        <figcaption>图 8：在 Codex 中与知识库对话的实战演示</figcaption>
+                    </figure>
+
+                    <figure>
+                        <img src="images/codex-obsidian/page-09.jpg" alt="知识检索效果" loading="lazy">
+                        <figcaption>图 9：AI 检索并总结本地知识库内容</figcaption>
+                    </figure>
+
+                    <h2>七、进阶技巧</h2>
+
+                    <h3>7.1 多知识库管理</h3>
+                    <p>
+                        你可以在 Codex 中添加多个 Obsidian 知识库作为不同项目，
+                        分别配置不同的 <code>AGENTS.md</code>，实现工作知识库、个人知识库、学习知识库的分离管理。
+                    </p>
+
+                    <h3>7.2 自动化工作流</h3>
+                    <p>结合 Codex 的自动化功能，可以设置定时任务：</p>
+                    <ul>
+                        <li>每天自动整理当天的日记内容，生成摘要并归档</li>
+                        <li>每周自动扫描知识库，标记长期未更新的"休眠笔记"</li>
+                        <li>自动为新增的外部资料生成标签和摘要</li>
+                    </ul>
+
+                    <h3>7.3 模板化笔记</h3>
+                    <p>在 Obsidian 中创建笔记模板（如会议记录、读书笔记等），配合 Codex 实现一键生成标准化笔记。</p>
+
+                    <figure>
+                        <img src="images/codex-obsidian/page-10.jpg" alt="进阶技巧" loading="lazy">
+                        <figcaption>图 10：进阶工作流与自动化配置</figcaption>
+                    </figure>
+
+                    <figure>
+                        <img src="images/codex-obsidian/page-11.jpg" alt="自动化演示" loading="lazy">
+                        <figcaption>图 11：自动化工作流效果演示</figcaption>
+                    </figure>
+
+                    <h2>八、常见问题与排查</h2>
+
+                    <h3>Q1: LLM Wiki 索引速度很慢怎么办？</h3>
+                    <ul>
+                        <li>检查是否选择了合适的嵌入模型，本地模型通常更快</li>
+                        <li>排除不需要索引的大型文件（如 PDF、图片）</li>
+                        <li>减少一次性索引的文件数量，分批进行</li>
+                    </ul>
+
+                    <h3>Q2: Codex 检索不到知识库内容？</h3>
+                    <ul>
+                        <li>确认知识库文件夹已正确添加为 Codex 项目</li>
+                        <li>检查 AGENTS.md 中是否正确配置了检索规则</li>
+                        <li>确保 LLM Wiki 已完成索引（查看插件状态）</li>
+                    </ul>
+
+                    <h3>Q3: 笔记内容更新后 AI 感知不到？</h3>
+                    <ul>
+                        <li>确认 LLM Wiki 设置为"文件变更时自动更新索引"</li>
+                        <li>手动触发一次重新索引</li>
+                        <li>重启 Codex 后重新连接知识库项目</li>
+                    </ul>
+
+                    <figure>
+                        <img src="images/codex-obsidian/page-12.jpg" alt="常见问题排查" loading="lazy">
+                        <figcaption>图 12：常见问题的排查与解决</figcaption>
+                    </figure>
+
+                    <h2>九、总结与展望</h2>
+                    <p>
+                        通过 Codex + Obsidian + LLM Wiki 的组合，你拥有了一个完全本地化、可对话交互的个人 AI 知识库。
+                        它不仅是一个笔记系统，更是一个能与 AI 深度融合的"第二大脑"。
+                    </p>
+                    <p>
+                        随着 LLM Wiki 和 Codex 的持续更新，本地 AI 知识库的能力边界还在不断扩展。
+                        未来你可以期待更智能的自动归类、更深度的知识图谱分析，以及与其他生产力工具的深度集成。
+                    </p>
+
+                    <figure>
+                        <img src="images/codex-obsidian/page-13.jpg" alt="总结" loading="lazy">
+                        <figcaption>图 13：本地 AI 知识库的未来展望</figcaption>
+                    </figure>
+
+                    <figure>
+                        <img src="images/codex-obsidian/page-14.jpg" alt="附加内容" loading="lazy">
+                        <figcaption>图 14：附加参考资料与扩展阅读</figcaption>
+                    </figure>
+
+                    <figure>
+                        <img src="images/codex-obsidian/page-15.jpg" alt="结尾" loading="lazy">
+                        <figcaption>图 15：教程总结与下一步建议</figcaption>
+                    </figure>
+
+                </div>
+
+                <div class="article-footer">
+                    <p>© 2026 郭猛 Ammon · 个人主页 · <a href="../index.html#articles" style="color:var(--accent);">返回文章分享</a></p>
+                </div>
+            </article>
+        </main>
+
+        <footer class="site-footer section">
+            <span>郭猛 Ammon</span>
+            <a href="#top">回到顶部</a>
+        </footer>
+    </div>
+
+    <script>history.scrollRestoration = 'manual';</script>
+    <script>
+        document.querySelector('[data-menu-toggle]')?.addEventListener('click', function (e) {
+            const open = document.body.classList.toggle('menu-open');
+            document.querySelector('[data-mobile-menu]')?.classList.toggle('active', open);
+            e.currentTarget.setAttribute('aria-expanded', String(open));
+            e.currentTarget.setAttribute('aria-label', open ? '关闭菜单' : '打开菜单');
+        });
+        document.querySelectorAll('#mobile-menu a').forEach(l => {
+            l.addEventListener('click', () => {
+                document.body.classList.remove('menu-open');
+                document.querySelector('[data-mobile-menu]')?.classList.remove('active');
+                const b = document.querySelector('[data-menu-toggle]');
+                if (b) { b.setAttribute('aria-expanded', 'false'); b.setAttribute('aria-label', '打开菜单'); }
+            });
+        });
+    </script>
+</body>
+
+</html>
