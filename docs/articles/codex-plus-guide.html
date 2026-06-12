@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Codex++：让你的 Codex 更强大的神器 — 郭猛 Ammon</title>
+    <meta name="description" content="详细介绍 Codex++ 工具的功能特性与使用方法，让你的 Codex AI 编程助手更加强大。">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../css/custom.css">
+    <style>
+        .article-page { max-width: 860px; margin: 0 auto; padding: 40px 24px 80px; }
+
+        .article-page .back-link {
+            display: inline-flex; align-items: center; gap: 6px;
+            color: var(--muted); text-decoration: none; font-size: 14px;
+            margin-bottom: 32px; transition: color .2s;
+        }
+        .article-page .back-link:hover { color: var(--accent); }
+
+        .article-header {
+            margin-bottom: 40px; padding-bottom: 32px;
+            border-bottom: 1px solid var(--line);
+        }
+        .article-header .article-date {
+            font-size: 13px; color: var(--muted); letter-spacing: .04em; text-transform: uppercase;
+        }
+        .article-header h1 {
+            font-family: var(--font-heading);
+            font-size: clamp(28px, 5vw, 40px); font-weight: 700;
+            color: var(--text); margin: 12px 0 16px;
+            line-height: 1.25; letter-spacing: -.01em;
+        }
+        .article-header .article-summary {
+            font-size: 17px; color: var(--muted); line-height: 1.7; max-width: 680px;
+        }
+
+        .article-body h2 {
+            font-family: var(--font-heading); font-size: 22px; font-weight: 600;
+            color: var(--accent); margin: 44px 0 16px; padding-top: 8px; letter-spacing: -.01em;
+        }
+        .article-body h3 {
+            font-family: var(--font-heading); font-size: 18px; font-weight: 600;
+            color: var(--text); margin: 28px 0 12px;
+        }
+        .article-body p { color: var(--soft); line-height: 1.78; margin: 0 0 16px; }
+        .article-body ul, .article-body ol { color: var(--soft); line-height: 1.78; margin: 0 0 20px; padding-left: 20px; }
+        .article-body li { margin-bottom: 6px; }
+
+        .article-body code {
+            background: var(--surface); color: var(--accent);
+            padding: 2px 7px; border-radius: 4px;
+            font-family: "SF Mono", "Fira Code", monospace; font-size: .9em;
+        }
+        .article-body pre {
+            background: var(--bg-soft); border: 1px solid var(--line);
+            border-radius: var(--radius); padding: 16px 20px; overflow-x: auto;
+            font-size: 14px; line-height: 1.6; margin: 0 0 20px;
+        }
+        .article-body pre code { background: none; color: var(--soft); padding: 0; }
+
+        .article-body figure {
+            margin: 0 0 32px; border-radius: var(--radius);
+            overflow: hidden; border: 1px solid var(--line);
+            background: var(--bg-soft);
+        }
+        .article-body figure img { display: block; width: 100%; height: auto; }
+        .article-body figure figcaption {
+            padding: 10px 14px; font-size: 13px; color: var(--muted);
+            text-align: center; border-top: 1px solid var(--line);
+        }
+
+        .article-body .tip-box {
+            background: var(--surface); border-left: 3px solid var(--accent);
+            border-radius: 0 var(--radius) var(--radius) 0; padding: 16px 20px;
+            margin: 0 0 24px; color: var(--soft); font-size: 15px;
+        }
+        .article-body .tip-box strong { color: var(--accent); }
+
+        .article-body blockquote {
+            border-left: 2px solid var(--line); margin: 0 0 16px;
+            padding: 4px 0 4px 16px; color: var(--muted); font-style: italic;
+        }
+
+        .article-body .source-link {
+            display: inline-flex; align-items: center; gap: 6px;
+            color: var(--accent); text-decoration: none; font-size: 14px;
+            font-weight: 600; transition: color .2s;
+        }
+        .article-body .source-link:hover { color: var(--text); }
+
+        .article-footer {
+            margin-top: 56px; padding-top: 24px;
+            border-top: 1px solid var(--line); color: var(--muted); font-size: 14px;
+        }
+
+        @media (max-width: 640px) {
+            .article-page { padding: 24px 16px 56px; }
+            .article-header h1 { font-size: 24px; }
+            .article-body h2 { font-size: 19px; }
+        }
+    </style>
+</head>
+
+<body>
+    <span id="top" class="top-anchor" aria-hidden="true"></span>
+    <div class="page-shell">
+        <header class="site-header">
+            <a class="brand" href="../index.html" aria-label="回到主页">
+                <img src="../assets/avatar.jpg" alt="郭猛 Ammon" class="brand-avatar" width="34" height="34">
+                <span>郭猛 Ammon</span>
+            </a>
+            <nav class="desktop-nav" aria-label="主导航">
+                <a href="../index.html">主页</a>
+                <a href="../api-hub.html">API 聚合导航</a>
+                <a href="../index.html#ai-explore">AI 探索</a>
+                <a href="../index.html#articles">文章分享</a>
+            </nav>
+            <div class="header-actions">
+                <button class="menu-toggle" type="button" data-menu-toggle aria-label="打开菜单" aria-controls="mobile-menu"
+                    aria-expanded="false">
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </header>
+
+        <div class="mobile-menu" id="mobile-menu" data-mobile-menu>
+            <a href="../index.html">主页</a>
+            <a href="../api-hub.html">API 聚合导航</a>
+            <a href="../index.html#ai-explore">AI 探索</a>
+            <a href="../index.html#articles">文章分享</a>
+        </div>
+
+        <main>
+            <article class="article-page">
+                <a class="back-link" href="../index.html#articles">← 返回文章分享</a>
+
+                <div class="article-header">
+                    <time class="article-date">2026.06</time>
+                    <h1>Codex++：让你的 Codex 更强大的神器</h1>
+                    <p class="article-summary">
+                        Codex++ 是一款增强 Codex 编程助手能力的工具，提供了更丰富的模型支持、自定义配置以及高级功能扩展，让 AI 编程体验更上一层楼。
+                    </p>
+                </div>
+
+                <div class="article-body">
+
+                    <h2>一、什么是 Codex++</h2>
+                    <p>
+                        Codex++ 是一个为 Codex 桌面端打造的功能增强工具，它在保留 Codex 原生体验的基础上，
+                        提供了额外的模型接入能力、配置管理功能和实用增强，让开发者可以更灵活地使用 AI 编程助手。
+                    </p>
+                    <p>Codex++ 主要解决以下痛点：</p>
+                    <ul>
+                        <li>官方 Codex 模型选择有限，Codex++ 扩展了可用模型范围</li>
+                        <li>支持接入多种第三方 API 后端，不再局限于单一服务商</li>
+                        <li>提供可视化的配置管理界面，降低配置门槛</li>
+                        <li>增加了更多实用功能，如自定义提示词、快捷键增强等</li>
+                    </ul>
+
+                    <figure>
+                        <img src="images/codex-plus/page-hq-1.jpg" alt="Codex++ 介绍" loading="lazy">
+                        <figcaption>图 1：Codex++ 工具介绍与概述</figcaption>
+                    </figure>
+
+                    <h2>二、核心功能特性</h2>
+                    <p>Codex++ 提供了一系列实用功能，让 Codex 的使用体验更加强大：</p>
+
+                    <h3>2.1 多模型支持</h3>
+                    <p>
+                        除了 Codex 原生支持的模型外，Codex++ 还可以接入更多第三方模型 API，
+                        包括 DeepSeek、GLM、Kimi 等国内主流模型，让开发者可以根据任务需求灵活切换。
+                    </p>
+
+                    <h3>2.2 一键配置切换</h3>
+                    <p>
+                        提供可视化的供应商管理界面，支持一键切换不同的 API 后端，
+                        无需手动修改配置文件或环境变量，大幅降低使用门槛。
+                    </p>
+
+                    <figure>
+                        <img src="images/codex-plus/page-hq-2.jpg" alt="Codex++ 功能特性" loading="lazy">
+                        <figcaption>图 2：Codex++ 核心功能特性展示</figcaption>
+                    </figure>
+
+                    <h2>三、安装与配置</h2>
+                    <p>Codex++ 的安装过程简单快捷，按照以下步骤即可完成配置：</p>
+                    <ol>
+                        <li>访问 Codex++ 的官方仓库或下载页面获取最新版本</li>
+                        <li>下载对应平台的安装包（支持 macOS / Windows / Linux）</li>
+                        <li>运行安装程序，按照引导完成基础设置</li>
+                        <li>在设置界面中添加你需要的模型供应商</li>
+                        <li>填写 API Key 和 Base URL，保存配置即可开始使用</li>
+                    </ol>
+
+                    <div class="tip-box">
+                        <strong>💡 提示：</strong>如果你已经配置过其他 AI 编程工具（如 CC Switch），
+                        Codex++ 的配置逻辑与之类似，可以快速上手。
+                    </div>
+
+                    <figure>
+                        <img src="images/codex-plus/page-hq-3.jpg" alt="Codex++ 安装配置" loading="lazy">
+                        <figcaption>图 3：Codex++ 安装与配置流程</figcaption>
+                    </figure>
+
+                    <h2>四、使用场景与技巧</h2>
+                    <p>Codex++ 在日常开发中有多种实用场景：</p>
+                    <ul>
+                        <li><strong>多模型协同：</strong>复杂任务用主力模型，简单任务切换轻量模型，节省费用</li>
+                        <li><strong>本地与云端结合：</strong>支持接入本地 Ollama 模型，敏感项目可完全离线使用</li>
+                        <li><strong>自定义工作流：</strong>为不同项目配置不同的默认模型和提示词模板</li>
+                        <li><strong>团队协作：</strong>导出/导入配置，团队成员间快速同步设置</li>
+                    </ul>
+
+                    <figure>
+                        <img src="images/codex-plus/page-hq-4.jpg" alt="Codex++ 使用场景" loading="lazy">
+                        <figcaption>图 4：Codex++ 使用场景与技巧分享</figcaption>
+                    </figure>
+
+                    <h2>五、总结</h2>
+                    <p>
+                        Codex++ 作为 Codex 的增强工具，在保持原有体验的同时，大大扩展了其能力和灵活性。
+                        对于希望在不同模型之间灵活切换、追求更高性价比的开发者来说，Codex++ 是一个值得尝试的选择。
+                    </p>
+
+                    <figure>
+                        <img src="images/codex-plus/page-hq-5.jpg" alt="Codex++ 总结" loading="lazy">
+                        <figcaption>图 5：Codex++ 总结与展望</figcaption>
+                    </figure>
+
+                    <p style="margin-top: 24px;">
+                        <a class="source-link" href="https://mp.weixin.qq.com/s/uUGixJLdGlnazrFEK1ey7Q" target="_blank" rel="noreferrer">
+                            📎 原文链接：微信公众号文章 →
+                        </a>
+                    </p>
+
+                </div>
+
+                <div class="article-footer">
+                    <p>© 2026 郭猛 Ammon · 个人主页 · <a href="../index.html#articles" style="color:var(--accent);">返回文章分享</a></p>
+                </div>
+            </article>
+        </main>
+
+        <footer class="site-footer section">
+            <span>郭猛 Ammon</span>
+            <a href="#top">回到顶部</a>
+        </footer>
+    </div>
+
+    <script>
+        document.querySelector('[data-menu-toggle]')?.addEventListener('click', function (e) {
+            const open = document.body.classList.toggle('menu-open');
+            document.querySelector('[data-mobile-menu]')?.classList.toggle('active', open);
+            e.currentTarget.setAttribute('aria-expanded', String(open));
+            e.currentTarget.setAttribute('aria-label', open ? '关闭菜单' : '打开菜单');
+        });
+        document.querySelectorAll('#mobile-menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                document.body.classList.remove('menu-open');
+                document.querySelector('[data-mobile-menu]')?.classList.remove('active');
+                const btn = document.querySelector('[data-menu-toggle]');
+                if (btn) { btn.setAttribute('aria-expanded', 'false'); btn.setAttribute('aria-label', '打开菜单'); }
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude Code 安装与 DeepSeek 接入手册 — 郭猛 Ammon</title>
+    <meta name="description" content="详细介绍 Claude Code CLI 的安装配置，以及如何通过 CC Switch 接入 DeepSeek API，包含完整步骤说明与常见问题排查。">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../css/custom.css">
+    <style>
+        .article-page { max-width: 860px; margin: 0 auto; padding: 40px 24px 80px; }
+
+        .article-page .back-link {
+            display: inline-flex; align-items: center; gap: 6px;
+            color: var(--muted); text-decoration: none; font-size: 14px;
+            margin-bottom: 32px; transition: color .2s;
+        }
+        .article-page .back-link:hover { color: var(--accent); }
+
+        .article-header {
+            margin-bottom: 40px; padding-bottom: 32px;
+            border-bottom: 1px solid var(--line);
+        }
+        .article-header .article-meta-row {
+            display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+            margin-bottom: 8px;
+        }
+        .article-header .article-date {
+            font-size: 13px; color: var(--muted); letter-spacing: .04em; text-transform: uppercase;
+        }
+        .article-header .article-version {
+            font-size: 12px; color: var(--muted);
+            background: var(--surface); padding: 2px 10px; border-radius: 12px;
+        }
+        .article-header h1 {
+            font-family: var(--font-heading);
+            font-size: clamp(28px, 5vw, 40px); font-weight: 700;
+            color: var(--text); margin: 12px 0 16px;
+            line-height: 1.25; letter-spacing: -.01em;
+        }
+        .article-header .article-summary {
+            font-size: 17px; color: var(--muted); line-height: 1.7; max-width: 680px;
+        }
+
+        .article-body h2 {
+            font-family: var(--font-heading); font-size: 22px; font-weight: 600;
+            color: var(--accent); margin: 44px 0 16px; padding-top: 8px; letter-spacing: -.01em;
+        }
+        .article-body h3 {
+            font-family: var(--font-heading); font-size: 18px; font-weight: 600;
+            color: var(--text); margin: 28px 0 12px;
+        }
+        .article-body h4 {
+            font-family: var(--font-heading); font-size: 15px; font-weight: 600;
+            color: var(--soft); margin: 20px 0 8px;
+        }
+        .article-body p { color: var(--soft); line-height: 1.78; margin: 0 0 16px; }
+        .article-body ul, .article-body ol { color: var(--soft); line-height: 1.78; margin: 0 0 20px; padding-left: 20px; }
+        .article-body li { margin-bottom: 6px; }
+
+        .article-body code {
+            background: var(--surface); color: var(--accent);
+            padding: 2px 7px; border-radius: 4px;
+            font-family: "SF Mono", "Fira Code", monospace; font-size: .9em;
+        }
+        .article-body pre {
+            background: var(--bg-soft); border: 1px solid var(--line);
+            border-radius: var(--radius); padding: 16px 20px; overflow-x: auto;
+            font-size: 14px; line-height: 1.6; margin: 0 0 20px;
+        }
+        .article-body pre code { background: none; color: var(--soft); padding: 0; }
+
+        .article-body table {
+            width: 100%; border-collapse: collapse; margin-bottom: 20px; color: var(--soft); font-size: 14px;
+        }
+        .article-body thead tr { border-bottom: 1px solid var(--line); }
+        .article-body th { text-align: left; padding: 8px 12px; color: var(--accent); font-weight: 600; }
+        .article-body td { padding: 8px 12px; vertical-align: top; }
+        .article-body tbody tr { border-bottom: 1px solid var(--line); }
+
+        .article-body .tip-box {
+            background: var(--surface); border-left: 3px solid var(--accent);
+            border-radius: 0 var(--radius) var(--radius) 0; padding: 16px 20px;
+            margin: 0 0 24px; color: var(--soft); font-size: 15px;
+        }
+        .article-body .tip-box strong { color: var(--accent); }
+        .article-body .tip-box.warn { border-left-color: #d4a04a; }
+        .article-body .tip-box.warn strong { color: #d4a04a; }
+
+        .article-body blockquote {
+            border-left: 2px solid var(--line); margin: 0 0 16px;
+            padding: 4px 0 4px 16px; color: var(--muted); font-style: italic;
+        }
+
+        .article-footer {
+            margin-top: 56px; padding-top: 24px;
+            border-top: 1px solid var(--line); color: var(--muted); font-size: 14px;
+        }
+
+        @media (max-width: 640px) {
+            .article-page { padding: 24px 16px 56px; }
+            .article-header h1 { font-size: 24px; }
+            .article-body h2 { font-size: 19px; }
+        }
+    </style>
+</head>
+
+<body>
+    <span id="top" class="top-anchor" aria-hidden="true"></span>
+    <div class="page-shell">
+        <header class="site-header">
+            <a class="brand" href="../index.html" aria-label="回到主页">
+                <img src="../assets/avatar.jpg" alt="郭猛 Ammon" class="brand-avatar" width="34" height="34">
+                <span>郭猛 Ammon</span>
+            </a>
+            <nav class="desktop-nav" aria-label="主导航">
+                <a href="../index.html">主页</a>
+                <a href="../api-hub.html">API 聚合导航</a>
+                <a href="../index.html#ai-explore">AI 探索</a>
+                <a href="../index.html#articles">文章分享</a>
+            </nav>
+            <div class="header-actions">
+                <button class="menu-toggle" type="button" data-menu-toggle aria-label="打开菜单" aria-controls="mobile-menu"
+                    aria-expanded="false">
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </header>
+
+        <div class="mobile-menu" id="mobile-menu" data-mobile-menu>
+            <a href="../index.html">主页</a>
+            <a href="../api-hub.html">API 聚合导航</a>
+            <a href="../index.html#ai-explore">AI 探索</a>
+            <a href="../index.html#articles">文章分享</a>
+        </div>
+
+        <main>
+            <article class="article-page">
+                <a class="back-link" href="../index.html#articles">← 返回文章分享</a>
+
+                <div class="article-header">
+                    <div class="article-meta-row">
+                        <time class="article-date">2026.06</time>
+                        <span class="article-version">v1.1</span>
+                    </div>
+                    <h1>Claude Code 安装与 DeepSeek 接入手册</h1>
+                    <p class="article-summary">
+                        详细介绍 Claude Code CLI 的安装配置流程，以及如何通过 CC Switch 图形化工具接入 DeepSeek API，附完整的常见问题排查指南。
+                    </p>
+                </div>
+
+                <div class="article-body">
+
+                    <!-- ===== 第一章 ===== -->
+                    <h2>一、概述</h2>
+
+                    <h3>1.1 什么是 Claude Code</h3>
+                    <p>
+                        Claude Code 是 Anthropic 官方推出的<strong>终端 AI 编程助手</strong>，它可以直接在命令行中理解你的整个代码库、执行操作、编辑文件、运行命令，并与 GitHub 等工具深度集成。你可以把它理解为一位驻扎在你项目目录里的资深开发者——它能读代码、写代码、调试、甚至帮你管理 Git 工作流。
+                    </p>
+                    <p>Claude Code 同时提供以下形态：</p>
+                    <table>
+                        <thead><tr><th>形态</th><th>说明</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>CLI 命令行</strong></td><td>终端中直接运行 <code>claude</code>，功能最完整</td></tr>
+                            <tr><td><strong>VS Code 扩展</strong></td><td>在 IDE 侧边栏中使用</td></tr>
+                            <tr><td><strong>桌面应用</strong></td><td>Mac/Windows 原生应用（JetBrains 插件也可用）</td></tr>
+                            <tr><td><strong>Web 版</strong></td><td>claude.ai/code，无需安装</td></tr>
+                        </tbody>
+                    </table>
+                    <p>本手册以 <strong>CLI 命令行版本</strong> 为主要安装目标。</p>
+
+                    <h3>1.2 为什么要接入 DeepSeek</h3>
+                    <p>Claude Code 默认对接 Anthropic 官方 API（Claude 系列模型）。但如果你在中国大陆使用，可能会面临以下痛点：</p>
+                    <ul>
+                        <li><strong>网络访问困难</strong>：Anthropic API 在国内可能无法直连</li>
+                        <li><strong>付费门槛</strong>：Claude Pro 订阅 $20/月（约 ¥140/月），对于个人开发者不便宜</li>
+                        <li><strong>按量付费更灵活</strong>：DeepSeek 提供按 token 计费，日常开发可能不到 ¥20/月</li>
+                    </ul>
+                    <p>DeepSeek V4 系列模型的能力已经非常出色，而且——关键点——<strong>DeepSeek 提供了原生的 Anthropic 兼容 API 端点</strong>，这意味着无需任何中间代理即可直接替换。</p>
+                    <p><strong>成本参考</strong>：</p>
+                    <table>
+                        <thead><tr><th>方案</th><th>费用</th></tr></thead>
+                        <tbody>
+                            <tr><td>Claude Pro 订阅</td><td>$20/月（约 ¥140/月）</td></tr>
+                            <tr><td>DeepSeek V4 按量付费</td><td>¥1-3 / 百万 token，日常使用约 ¥10-30/月</td></tr>
+                            <tr><td>DeepSeek 缓存命中</td><td>¥0.02 / 百万 token（命中率可达 98%+）</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h3>1.3 本手册的技术路线</h3>
+                    <p>经过社区大量验证，当前最简洁、最稳定的方案是：</p>
+                    <pre><code>Claude Code CLI  →  CC Switch（配置管理）  →  DeepSeek Anthropic 兼容端点</code></pre>
+                    <p><strong>为什么不需要代理层？</strong>过去有人推荐 LiteLLM、one-api 等中间代理来做 API 格式转换，但 DeepSeek 现在已经原生提供 <code>https://api.deepseek.com/anthropic</code> 端点，直接支持 Anthropic 协议。CC Switch 的作用仅仅是帮你<strong>图形化管理环境变量配置</strong>，不引入额外的网络跳转和故障点。</p>
+
+                    <!-- ===== 第二章 ===== -->
+                    <h2>二、环境准备</h2>
+
+                    <h3>2.1 系统要求</h3>
+                    <table>
+                        <thead><tr><th>操作系统</th><th>最低版本</th></tr></thead>
+                        <tbody>
+                            <tr><td>macOS</td><td>macOS 12 (Monterey) 及以上</td></tr>
+                            <tr><td>Windows</td><td>Windows 10 及以上</td></tr>
+                            <tr><td>Linux</td><td>Ubuntu 20.04+、Debian 11+、CentOS 7+</td></tr>
+                        </tbody>
+                    </table>
+                    <p>硬件无特殊要求，Claude Code 本身不运行本地模型，计算在云端完成。</p>
+                    <p><strong>前置依赖总览</strong>：</p>
+                    <table>
+                        <thead><tr><th>依赖</th><th>最低版本</th><th>说明</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Node.js</strong></td><td>18.0+（推荐 20 LTS 或 22 LTS）</td><td>Claude Code 的运行环境</td></tr>
+                            <tr><td><strong>npm</strong></td><td>9.0+</td><td>随 Node.js 安装，用于安装 Claude Code</td></tr>
+                            <tr><td><strong>Git</strong></td><td>2.38+（最低 2.23）</td><td>用于仓库分析、变更追踪、提交管理</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="tip-box warn">
+                        <strong>⚠️ 重要：</strong>以上三个依赖缺一不可。尤其是 Git——Claude Code 深度依赖 Git 来理解代码历史、追踪文件变更、生成 commit message 等。Windows 用户必须安装 <strong>Git for Windows</strong>。
+                    </div>
+
+                    <h3>2.2 安装 Node.js 18+</h3>
+                    <p><strong>推荐方式：使用 nvm 安装</strong></p>
+                    <p>macOS / Linux：</p>
+                    <pre><code># 安装 nvm
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+# 重启终端或执行
+source ~/.zshrc
+# 安装 Node.js 20 LTS（推荐）
+nvm install 20
+# 验证版本
+node --version   # 应输出 v20.x.x
+npm --version    # 应输出 10.x.x</code></pre>
+                    <p>Windows 用户推荐使用 <a href="https://github.com/coreybutler/nvm-windows/releases" target="_blank" rel="noreferrer">nvm-windows</a>，或从 <a href="https://nodejs.org/" target="_blank" rel="noreferrer">nodejs.org</a> 下载 LTS 安装包直接安装。</p>
+
+                    <h3>2.3 安装 Git 2.38+</h3>
+                    <p>Claude Code 深度依赖 Git。<strong>即使你的项目不使用 Git 做版本控制，Claude Code 也需要 Git 来运行。</strong></p>
+                    <h4>macOS</h4>
+                    <pre><code># 方式一：Xcode Command Line Tools
+xcode-select --install
+
+# 方式二：Homebrew（推荐）
+brew install git
+git --version   # 应输出 git version 2.47.x 或更高</code></pre>
+                    <h4>Windows</h4>
+                    <p>下载并安装 <a href="https://git-scm.com/downloads/win" target="_blank" rel="noreferrer">Git for Windows</a>，安装时注意：默认编辑器选 VS Code；PATH 环境选 "Git from the command line and also from 3rd-party software"；行结束符选 "Checkout as-is, commit Unix-style"。</p>
+
+                    <div class="tip-box warn">
+                        <strong>⚠️ Windows 特别提醒：</strong>Claude Code 在 Windows 上运行时，内部会使用 Git Bash 执行命令。即使你日常使用 PowerShell 或 CMD，也<strong>必须安装 Git for Windows</strong>。
+                    </div>
+
+                    <h4>Linux</h4>
+                    <pre><code># Ubuntu / Debian
+sudo apt update && sudo apt install git
+# 如果版本过低
+sudo add-apt-repository ppa:git-core/ppa && sudo apt update && sudo apt install git
+
+# CentOS / RHEL: sudo yum install git
+# Fedora: sudo dnf install git
+# Arch: sudo pacman -S git</code></pre>
+
+                    <p><strong>安装后基础配置（强烈建议）</strong>：</p>
+                    <pre><code>git config --global user.name "你的姓名"
+git config --global user.email "你的邮箱@example.com"</code></pre>
+
+                    <h3>2.4 注册 DeepSeek 并获取 API Key</h3>
+                    <ol>
+                        <li>访问 <a href="https://platform.deepseek.com/" target="_blank" rel="noreferrer">platform.deepseek.com</a></li>
+                        <li>注册账号（支持手机号注册）</li>
+                        <li>登录后，在左侧菜单找到 <strong>"API Keys"</strong></li>
+                        <li>点击"创建新的 API Key"，输入名称（如 <code>claude-code</code>），点击创建</li>
+                        <li><strong>立即复制 API Key！</strong>它只显示一次</li>
+                        <li>建议在"用量管理"页面充值 ¥10-50 用于测试</li>
+                    </ol>
+
+                    <div class="tip-box warn">
+                        <strong>⚠️ 安全提示：</strong>API Key 相当于你的账户密码，请勿泄露给他人或提交到公开仓库。
+                    </div>
+
+                    <h3>2.5 环境准备检查清单</h3>
+                    <pre><code>node --version   # 应 ≥ v18.0.0（推荐 v20.x 或 v22.x）
+npm --version    # 应 ≥ 9.0.0（推荐 10.x）
+git --version    # 应 ≥ 2.38.0（推荐 2.47+）</code></pre>
+                    <table>
+                        <thead><tr><th>检查项</th><th>预期结果</th><th>如未通过</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>node --version</code></td><td>v18.0.0 及以上</td><td>见 2.2 节</td></tr>
+                            <tr><td><code>npm --version</code></td><td>9.0.0 及以上</td><td>升级 Node.js</td></tr>
+                            <tr><td><code>git --version</code></td><td>2.38.0 及以上</td><td>见 2.3 节</td></tr>
+                            <tr><td>DeepSeek API Key</td><td>已创建并复制保存</td><td>见 2.4 节</td></tr>
+                            <tr><td>DeepSeek 余额</td><td>≥ ¥10（建议）</td><td>platform.deepseek.com 充值</td></tr>
+                        </tbody>
+                    </table>
+
+                    <!-- ===== 第三章 ===== -->
+                    <h2>三、安装 Claude Code</h2>
+
+                    <h3>3.1 通过 npm 全局安装</h3>
+                    <pre><code>npm install -g @anthropic-ai/claude-code</code></pre>
+                    <p>国内用户可使用淘宝镜像加速：</p>
+                    <pre><code>npm install -g @anthropic-ai/claude-code --registry=https://registry.npmmirror.com</code></pre>
+                    <p>安装过程通常持续 1-2 分钟。</p>
+
+                    <h3>3.2 验证安装</h3>
+                    <pre><code>claude --version   # 应输出版本号如 v1.0.x
+claude --help      # 查看帮助信息</code></pre>
+
+                    <h3>3.3 跳过新手引导</h3>
+                    <p>Claude Code 首次启动时默认引导登录 Anthropic 账号。由于我们使用 DeepSeek，需要跳过：</p>
+                    <p><strong>macOS / Linux</strong>：</p>
+                    <pre><code>echo '{"hasCompletedOnboarding": true}' > ~/.claude.json</code></pre>
+                    <p><strong>Windows (PowerShell)</strong>：</p>
+                    <pre><code>echo '{"hasCompletedOnboarding": true}' > $env:USERPROFILE\.claude.json</code></pre>
+                    <p>也可以手动创建文件 <code>~/.claude.json</code>，内容为：</p>
+                    <pre><code>{
+"hasCompletedOnboarding": true
+}</code></pre>
+
+                    <!-- ===== 第四章 ===== -->
+                    <h2>四、安装并配置 CC Switch</h2>
+
+                    <h3>4.1 CC Switch 简介</h3>
+                    <p>
+                        <a href="https://github.com/farion1231/cc-switch" target="_blank" rel="noreferrer">CC Switch</a>
+                        是一款<strong>跨平台桌面应用</strong>，专为 Claude Code、Codex、OpenCode、Gemini CLI 等 AI 编程工具提供可视化的供应商配置管理。
+                    </p>
+                    <table>
+                        <thead><tr><th>功能</th><th>说明</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>一键切换模型供应商</strong></td><td>DeepSeek、GLM、Kimi、MiniMax 等</td></tr>
+                            <tr><td><strong>MCP 管理</strong></td><td>管理 MCP 服务器配置</td></tr>
+                            <tr><td><strong>Skills / Prompts 管理</strong></td><td>同步和管理自定义技能与提示词</td></tr>
+                            <tr><td><strong>WebDAV 同步</strong></td><td>多设备间同步配置</td></tr>
+                            <tr><td><strong>内置 WebUI</strong></td><td>本地管理页面 <code>http://127.0.0.1:15722/</code></td></tr>
+                        </tbody>
+                    </table>
+                    <p>CC Switch 的核心原理是<strong>管理环境变量配置</strong>——帮你把正确的配置写入系统，Claude Code 启动时直接读取，然后直连 DeepSeek。</p>
+
+                    <h3>4.2 安装 CC Switch</h3>
+                    <h4>macOS</h4>
+                    <pre><code># Homebrew 安装（推荐）
+brew install --cask cc-switch</code></pre>
+                    <p>或从 <a href="https://github.com/farion1231/cc-switch/releases" target="_blank" rel="noreferrer">GitHub Releases</a> 下载 <code>.dmg</code> 手动安装。首次打开时若提示"无法验证开发者"，前往<strong>系统设置 → 隐私与安全性</strong>，点击"仍要打开"。</p>
+
+                    <h4>Windows</h4>
+                    <p>从 GitHub Releases 下载 <code>.msi</code> 安装包，双击运行安装向导。</p>
+
+                    <h4>Linux</h4>
+                    <pre><code># Arch Linux (AUR)
+paru -S cc-switch-bin
+
+# 其他发行版：下载 .AppImage
+chmod +x CC-Switch-*.AppImage
+./CC-Switch-*.AppImage</code></pre>
+
+                    <h3>4.3 添加 DeepSeek 提供商</h3>
+                    <ol>
+                        <li>点击左侧 <strong>"Providers"（提供商）</strong>菜单</li>
+                        <li>点击<strong>"添加提供商"</strong>按钮</li>
+                        <li>填写以下配置：</li>
+                    </ol>
+                    <table>
+                        <thead><tr><th>配置项</th><th>填写内容</th><th>说明</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Provider Name</strong></td><td><code>DeepSeek</code></td><td>自定义，随意填</td></tr>
+                            <tr><td><strong>Base URL</strong></td><td><code>https://api.deepseek.com/anthropic</code></td><td>⚠️ 注意是 <code>/anthropic</code> 结尾</td></tr>
+                            <tr><td><strong>API Key</strong></td><td><code>sk-xxxxxxxxxxxxxxxx</code></td><td>DeepSeek 平台创建的密钥</td></tr>
+                            <tr><td><strong>Opus</strong></td><td><code>deepseek-v4-pro</code></td><td>复杂任务主力模型</td></tr>
+                            <tr><td><strong>Sonnet</strong></td><td><code>deepseek-v4-pro</code></td><td>日常对话模型</td></tr>
+                            <tr><td><strong>Haiku</strong></td><td><code>deepseek-v4-flash</code></td><td>简单高频任务轻量模型</td></tr>
+                        </tbody>
+                    </table>
+                    <p>4. 点击<strong>"保存"</strong></p>
+
+                    <div class="tip-box">
+                        <strong>💡 模型说明：</strong><br>
+                        <code>deepseek-v4-pro</code>：DeepSeek V4 旗舰模型，推理能力最强<br>
+                        <code>deepseek-v4-flash</code>：轻量快速版，适合简单任务<br>
+                        将 Opus 和 Sonnet 指向同一模型是可行的——CC Switch 遵循 Claude Code 的三层模型映射机制。
+                    </div>
+
+                    <h3>4.4 选择 DeepSeek 为当前活跃提供商</h3>
+                    <ol>
+                        <li>在 CC Switch 主界面的提供商列表中，找到刚创建的 <code>DeepSeek</code></li>
+                        <li>点击右侧的<strong>"启用/切换"</strong>按钮</li>
+                        <li>提示"已切换"，配置已生效</li>
+                    </ol>
+                    <p>CC Switch 的设置是持久化的，不需要每次启动都重新配置。</p>
+
+                    <h3>4.5 关键注意事项</h3>
+                    <div class="tip-box warn">
+                        <strong>⚠️ 模型名不要带 <code>[1m]</code> 后缀：</strong>CC Switch 的本地路由模式下，模型名被原样转发。如果在模型名里写了 <code>deepseek-v4-pro[1m]</code>，会导致 DeepSeek 无法识别，可能回退到 Flash 模型。
+                    </div>
+                    <p><strong>路由模式 vs 代理模式</strong>：</p>
+                    <table>
+                        <thead><tr><th>模式</th><th>原理</th><th>适用场景</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>本地路由</strong></td><td>直接修改环境变量，直连 DeepSeek</td><td>日常使用，推荐</td></tr>
+                            <tr><td><strong>代理模式</strong></td><td>启动本地代理服务转发请求</td><td>需要日志/缓存时</td></tr>
+                        </tbody>
+                    </table>
+                    <p>日常使用推荐<strong>本地路由模式</strong>，性能最佳，无额外延迟。</p>
+
+                    <!-- ===== 第五章 ===== -->
+                    <h2>五、验证一切正常</h2>
+
+                    <h3>5.1 启动 Claude Code</h3>
+                    <pre><code>cd 你的项目目录
+claude</code></pre>
+                    <p>首次启动可能会询问初始设置问题（如是否同意数据收集等），如实回答即可。</p>
+
+                    <h3>5.2 简单对话测试</h3>
+                    <p>在 Claude Code 的交互提示符下输入：</p>
+                    <pre><code>你好，请用中文介绍一下你自己，并告诉我你是什么模型</code></pre>
+                    <p>如果看到类似以下回复，说明一切正常：</p>
+                    <blockquote>你好！我是 DeepSeek V4 Pro，由深度求索公司开发的大型语言模型。我目前正在通过 Claude Code 的框架为你服务……</blockquote>
+
+                    <h3>5.3 如何确认当前走的是 DeepSeek</h3>
+                    <ul>
+                        <li><strong>方式一：查看用量</strong> — 登录 platform.deepseek.com，进入"用量管理"，看 token 消耗量是否在增长</li>
+                        <li><strong>方式二：查看 CC Switch 日志</strong> — 在界面中查看最近请求记录</li>
+                        <li><strong>方式三：开启调试日志</strong> — <code>export ANTHROPIC_LOG=debug</code> 后启动 <code>claude</code></li>
+                    </ul>
+
+                    <!-- ===== 第六章 ===== -->
+                    <h2>六、进阶配置</h2>
+
+                    <h3>6.1 VS Code 扩展版 Claude Code 的配置</h3>
+                    <ol>
+                        <li>在 VS Code 扩展市场搜索 <strong>"Claude Code"</strong> 并安装</li>
+                        <li>确保 CC Switch 已配置并启用 DeepSeek（对 CLI 和扩展同时生效）</li>
+                        <li>使用 <code>Cmd+Shift+P</code>（macOS）或 <code>Ctrl+Shift+P</code>（Windows），搜索 "Claude Code"</li>
+                    </ol>
+                    <div class="tip-box"><strong>💡 提示：</strong>从终端启动 VS Code（<code>code .</code>）而非从 Dock/开始菜单启动，以确保环境变量正确传递。</div>
+
+                    <h3>6.2 多供应商切换</h3>
+                    <p>在 CC Switch 主界面，点击要切换的供应商旁的"启用"按钮即可，无需重启终端。</p>
+                    <table>
+                        <thead><tr><th>场景</th><th>推荐供应商</th><th>推荐模型</th></tr></thead>
+                        <tbody>
+                            <tr><td>日常开发（主力）</td><td>DeepSeek</td><td>deepseek-v4-pro</td></tr>
+                            <tr><td>简单任务 / 高频调用</td><td>DeepSeek</td><td>deepseek-v4-flash</td></tr>
+                            <tr><td>特殊需求（免费额度）</td><td>GLM</td><td>glm-4-plus</td></tr>
+                            <tr><td>超长上下文任务</td><td>Kimi</td><td>moonshot-v1-128k</td></tr>
+                            <tr><td>追求最强推理（偶尔）</td><td>Anthropic 官方</td><td>claude-sonnet-4-6</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h3>6.3 MCP 服务器管理</h3>
+                    <p>CC Switch 内置了 MCP（Model Context Protocol）服务器管理功能。在 <strong>"MCP"</strong> 面板中，可以添加社区提供的 MCP 服务器、配置参数、一键启用/禁用，以及通过 WebDAV 同步配置到多台设备。</p>
+
+                    <!-- ===== 附录 A ===== -->
+                    <h2>附录 A：备选方案</h2>
+
+                    <h3>A.1 手动环境变量配置（不用 CC Switch）</h3>
+                    <p>直接在终端中设置环境变量，效果与 CC Switch 完全一致：</p>
+                    <p><strong>临时设置（仅当前终端会话）</strong>：</p>
+                    <pre><code>export ANTHROPIC_BASE_URL=https://api.deepseek.com/anthropic
+export ANTHROPIC_AUTH_TOKEN=sk-你的DeepSeek-API-Key
+export ANTHROPIC_MODEL=deepseek-v4-pro
+export ANTHROPIC_DEFAULT_OPUS_MODEL=deepseek-v4-pro
+export ANTHROPIC_DEFAULT_SONNET_MODEL=deepseek-v4-pro
+export ANTHROPIC_DEFAULT_HAIKU_MODEL=deepseek-v4-flash
+export CLAUDE_CODE_SUBAGENT_MODEL=deepseek-v4-flash</code></pre>
+                    <p><strong>永久设置（推荐）</strong>：将上述 <code>export</code> 语句追加到 <code>~/.zshrc</code>（或 <code>~/.bashrc</code>），然后 <code>source ~/.zshrc</code>。</p>
+                    <p><strong>Windows (PowerShell 永久设置)</strong>：使用 <code>[System.Environment]::SetEnvironmentVariable(...)</code> 命令，设置后重启终端即可。</p>
+
+                    <h3>A.2 CLI 版切换工具</h3>
+                    <table>
+                        <thead><tr><th>工具</th><th>安装方式</th><th>特点</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>cswitch-tui</strong></td><td><code>npm install -g ccswitch-tui</code></td><td>TUI 交互界面，键盘操作</td></tr>
+                            <tr><td><strong>@bainiu/ccswitch</strong></td><td><code>npx @bainiu/ccswitch</code></td><td>零安装，直接运行</td></tr>
+                            <tr><td><strong>Go 版 ccswitch</strong></td><td>curl 安装脚本一键安装</td><td>单二进制，启动快，适合服务器</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h3>A.3 代理方案（高级 / 特殊场景）</h3>
+                    <p>对于企业统一 AI 网关、审计日志、请求缓存等场景，可考虑 LiteLLM 或 one-api 代理。个人开发者一般不需要——代理方案引入了额外的网络跳转和故障点。</p>
+
+                    <!-- ===== 附录 B ===== -->
+                    <h2>附录 B：常见问题排查</h2>
+
+                    <h3>B.1 npm 安装速度慢 / 失败</h3>
+                    <pre><code># 方案一：使用淘宝 npm 镜像
+npm install -g @anthropic-ai/claude-code --registry=https://registry.npmmirror.com
+
+# 方案二：永久切换 npm 源
+npm config set registry https://registry.npmmirror.com</code></pre>
+
+                    <h3>B.2 CC Switch 无法启动</h3>
+                    <p><strong>macOS</strong>：提示"无法验证开发者"→ 系统设置 → 隐私与安全性 → 仍要打开。打开后闪退 → 尝试重新下载最新版。</p>
+                    <p><strong>Windows</strong>：杀毒软件拦截 → 添加为信任应用。缺少运行库 → 安装 Visual C++ Redistributable。</p>
+                    <p><strong>Linux</strong>：AppImage 无法运行 → 确保已安装 <code>fuse</code>：<code>sudo apt install fuse</code>。</p>
+
+                    <h3>B.3 对话报错 / 无响应</h3>
+                    <ol>
+                        <li>检查 API Key 是否完整（<code>sk-</code> 开头）</li>
+                        <li>检查 Base URL 是 <code>https://api.deepseek.com/anthropic</code>（不是 <code>/v1</code>）</li>
+                        <li>检查 DeepSeek 账户余额</li>
+                        <li>用 curl 直连测试排除网络问题</li>
+                    </ol>
+
+                    <h3>B.4 模型能力感觉不对</h3>
+                    <ol>
+                        <li>确认没有回退到 flash 模型</li>
+                        <li>确认模型名没有多余后缀（如 <code>[1m]</code>）</li>
+                        <li>检查 CC Switch 当前启用的供应商</li>
+                        <li>检查是否有环境变量与 CC Switch 冲突</li>
+                    </ol>
+
+                    <h3>B.5 DeepSeek 余额 / 充值</h3>
+                    <p>登录 platform.deepseek.com，在"用量管理"页面查看余额。支持微信支付 / 支付宝充值，建议设置余额告警避免突然欠费。</p>
+
+                    <h3>B.6 Git 相关问题</h3>
+                    <ul>
+                        <li><strong>"git not found"</strong>：确认 Git 已安装且 PATH 配置正确；Windows 用户必须安装 Git for Windows</li>
+                        <li><strong>非 Git 仓库报错</strong>：执行 <code>git init && git add . && git commit -m "初始提交"</code></li>
+                    </ul>
+
+                    <h3>B.7 其他问题速查</h3>
+                    <table>
+                        <thead><tr><th>问题</th><th>可能原因</th><th>解决方案</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>claude</code> 命令找不到</td><td>npm 全局路径未在 PATH</td><td>检查 <code>npm list -g --depth=0</code>，确认安装路径</td></tr>
+                            <tr><td>提示 "git version too old"</td><td>Git 低于 2.23</td><td>升级 Git 到 2.38+</td></tr>
+                            <tr><td>CC Switch 保存后不生效</td><td>需重启终端</td><td>关闭当前终端窗口重新打开</td></tr>
+                            <tr><td>VS Code 扩展找不到</td><td>环境变量未传递</td><td>从终端 <code>code .</code> 启动 VS Code</td></tr>
+                            <tr><td>报错 "model not found"</td><td>模型名拼写错误</td><td>确认为 <code>deepseek-v4-pro</code> 或 <code>deepseek-v4-flash</code></td></tr>
+                        </tbody>
+                    </table>
+
+                </div>
+
+                <div class="article-footer">
+                    <p>© 2026 郭猛 Ammon · 个人主页 · <a href="../index.html#articles" style="color:var(--accent);">返回文章分享</a></p>
+                </div>
+            </article>
+        </main>
+
+        <footer class="site-footer section">
+            <span>郭猛 Ammon</span>
+            <a href="#top">回到顶部</a>
+        </footer>
+    </div>
+
+    <script>
+        document.querySelector('[data-menu-toggle]')?.addEventListener('click', function (e) {
+            const open = document.body.classList.toggle('menu-open');
+            document.querySelector('[data-mobile-menu]')?.classList.toggle('active', open);
+            e.currentTarget.setAttribute('aria-expanded', String(open));
+            e.currentTarget.setAttribute('aria-label', open ? '关闭菜单' : '打开菜单');
+        });
+        document.querySelectorAll('#mobile-menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                document.body.classList.remove('menu-open');
+                document.querySelector('[data-mobile-menu]')?.classList.remove('active');
+                const btn = document.querySelector('[data-menu-toggle]');
+                if (btn) { btn.setAttribute('aria-expanded', 'false'); btn.setAttribute('aria-label', '打开菜单'); }
+            });
+        });
+    </script>
+</body>
+
+</html>

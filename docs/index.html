@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人主页 | AI 探索与文章分享</title>
+    <meta name="description" content="个人主页，分享 AI 探索与文章。">
+    <meta name="robots" content="index,follow">
+    <link rel="icon" id="favicon" type="image/svg+xml" href="assets/avatar.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/custom.css">
+</head>
+
+<body>
+    <span id="top" class="top-anchor" aria-hidden="true"></span>
+    <div class="page-shell">
+        <header class="site-header">
+            <a class="brand" href="#top" aria-label="回到顶部">
+                <img src="assets/avatar.jpg" alt="郭猛 Ammon" class="brand-avatar" width="34" height="34">
+                <span data-i18n="brandName">郭猛 Ammon</span>
+            </a>
+
+            <nav class="desktop-nav" aria-label="主导航">
+                <a href="#top" data-i18n="navHome">主页</a>
+                <a href="api-hub.html" data-i18n="navAPI">API 聚合导航</a>
+                <a href="#ai-explore" data-i18n="navAI">AI 探索</a>
+                <a href="#articles" data-i18n="navArticles">文章分享</a>
+            </nav>
+
+            <div class="header-actions">
+                <button class="menu-toggle" type="button" data-menu-toggle aria-label="打开菜单" aria-controls="mobile-menu"
+                    aria-expanded="false">
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </header>
+
+        <div class="mobile-menu" id="mobile-menu" data-mobile-menu>
+            <a href="#top" data-i18n="navHome">主页</a>
+            <a href="api-hub.html" data-i18n="navAPI">API 聚合导航</a>
+            <a href="#ai-explore" data-i18n="navAI">AI 探索</a>
+            <a href="#articles" data-i18n="navArticles">文章分享</a>
+        </div>
+
+        <main>
+            <!-- Hero 抬头式自我介绍 -->
+            <section class="hero section" aria-labelledby="hero-title">
+                <div class="hero-copy reveal">
+                    <h1 id="hero-title" data-i18n-lines="heroTitle">
+                        <span>探索 AI</span>
+                        <span>分享所知</span>
+                    </h1>
+                    <p class="hero-summary" data-i18n="heroSummary">
+                        关注 AI 技术与应用，收藏并分享优质资源，记录学习与思考。
+                    </p>
+                    <div class="hero-tags" data-list="heroTags"></div>
+                    <div class="hero-brief" aria-label="Profile highlights">
+                        <div>
+                            <span data-i18n="briefLabel1">AI 探索</span>
+                            <strong data-i18n="briefValue1">大模型、Agent、RAG 与开源工具</strong>
+                        </div>
+                        <div>
+                            <span data-i18n="briefLabel2">技术栈</span>
+                            <strong data-i18n="briefValue2">LLM / Prompt Engineering / Full-stack</strong>
+                        </div>
+                        <div>
+                            <span data-i18n="briefLabel3">关注方向</span>
+                            <strong data-i18n="briefValue3">AI 应用落地、知识分享与开源协作</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hero-visual reveal" aria-label="Hero visual">
+                    <img src="assets/portfolio-hero.jpg" alt="Hero visual" class="hero-image" width="1672" height="941">
+                    <div class="signal-panel">
+                        <span data-i18n="signalRole">探索方向</span>
+                        <strong data-i18n="signalTitle">AI 与开源技术</strong>
+                        <small data-i18n="signalStack">LLM / Agent / RAG / Open Source</small>
+                    </div>
+                </div>
+            </section>
+
+            <!-- AI 探索 - 资源推荐 -->
+            <section class="section ai-explore" id="ai-explore" aria-labelledby="ai-title">
+                <div class="section-heading reveal">
+                    <p data-i18n="aiKicker">AI Explore</p>
+                    <h2 id="ai-title" data-i18n="aiTitle">AI 探索与资源推荐</h2>
+                </div>
+
+                <!-- 分类筛选标签 -->
+                <div class="filter-tabs reveal" data-filter-tabs></div>
+
+                <!-- 资源卡片列表 -->
+                <div class="resource-grid" data-resources></div>
+                <div class="show-more-wrap" data-show-more-wrap>
+                    <button class="show-more-btn" data-show-more data-i18n="showMore">显示更多</button>
+                </div>
+            </section>
+
+            <!-- 文章分享 -->
+            <section class="section articles" id="articles" aria-labelledby="articles-title">
+                <div class="section-heading reveal">
+                    <p data-i18n="articlesKicker">Articles</p>
+                    <h2 id="articles-title" data-i18n="articlesTitle">文章分享</h2>
+                </div>
+
+                <div class="article-list" data-articles></div>
+                <div class="show-more-wrap" data-articles-show-more-wrap>
+                    <button class="show-more-btn" data-articles-show-more data-i18n="showMore">显示更多</button>
+                </div>
+            </section>
+        </main>
+
+        <footer class="site-footer section">
+            <span data-i18n="footerName">个人主页</span>
+            <a href="#top" data-i18n="footerTop">回到顶部</a>
+        </footer>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+
+</html>

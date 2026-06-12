@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>easy-openclaw — OpenClaw 对话式配置向导</title>
+    <meta name="description" content="easy-openclaw 是一个面向 OpenClaw 的对话式配置向导：基础优化、渠道增强、Skills 安装和新渠道接入，一次走完。">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../css/custom.css">
+    <style>
+        .reveal { opacity: 0; transform: translateY(18px); transition: opacity .6s ease, transform .6s ease; }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+        /* ===== 页面容器 ===== */
+        .article-page { max-width: 860px; margin: 0 auto; padding: 40px 24px 80px; }
+
+        /* ===== 通用区块标签 ===== */
+        .sec-label {
+            display: inline-block; font-size: 12px; font-weight: 600;
+            color: var(--accent); background: rgba(191,162,103,0.12);
+            padding: 4px 12px; border-radius: 999px; margin-bottom: 12px; letter-spacing: .04em;
+        }
+
+        /* ===== Hero ===== */
+        .hero-block { margin-bottom: 40px; padding-bottom: 32px; border-bottom: 1px solid var(--line); }
+        .hero-block h1 {
+            font-family: var(--font-heading);
+            font-size: clamp(28px, 5vw, 40px); font-weight: 700;
+            color: var(--text); margin: 12px 0 16px; line-height: 1.25; letter-spacing: -.01em;
+        }
+        .hero-sub { font-size: 17px; color: var(--muted); max-width: 680px; line-height: 1.7; margin: 0 0 28px; }
+        .hero-sub code { background: var(--surface); padding: 2px 7px; border-radius: 4px; font-size: .9em; color: var(--accent); }
+        .hero-btns { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 36px; }
+        .btn-primary {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: var(--accent); color: #11110f; text-decoration: none;
+            padding: 12px 24px; border-radius: 8px; font-weight: 700; font-size: 15px;
+            font-family: var(--font-heading); transition: filter .2s;
+        }
+        .btn-primary:hover { filter: brightness(1.15); }
+        .btn-secondary {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: transparent; color: var(--text); text-decoration: none;
+            border: 1px solid var(--line-strong); padding: 12px 24px; border-radius: 8px;
+            font-weight: 600; font-size: 15px; font-family: var(--font-heading); transition: all .2s;
+        }
+        .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+        /* Meta 四栏 */
+        .meta-row {
+            display: grid; grid-template-columns: repeat(4, 1fr);
+            border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden;
+            background: var(--line);
+            gap: 1px;
+        }
+        .meta-item {
+            background: var(--bg-soft); padding: 26px 22px;
+            display: flex; flex-direction: column; gap: 8px;
+        }
+        .meta-item .meta-title { font-family: var(--font-heading); font-size: 1rem; font-weight: 700; color: var(--accent); }
+        .meta-item .meta-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.55; }
+
+        /* ===== 通用区块 ===== */
+        .block { margin-bottom: 48px; }
+        .block-head { margin-bottom: 28px; }
+        .block-head h2 {
+            font-family: var(--font-heading); font-size: 22px; font-weight: 600;
+            color: var(--accent); margin: 0 0 12px; padding-top: 8px; letter-spacing: -.01em;
+        }
+        .block-head p { color: var(--muted); max-width: 620px; line-height: 1.78; }
+
+        /* ===== 轮播 ===== */
+        .carousel-tabs { display: flex; gap: 8px; margin-bottom: 28px; flex-wrap: wrap; }
+        .carousel-tab {
+            padding: 9px 22px; border-radius: 999px; font-size: 14px; font-weight: 600;
+            border: 1px solid var(--line); background: transparent; color: var(--muted);
+            cursor: pointer; font-family: var(--font-body); transition: all .2s;
+        }
+        .carousel-tab.on { background: var(--accent); color: var(--ink); border-color: var(--accent); }
+        .carousel-tab:hover:not(.on) { border-color: var(--line-strong); color: var(--text); }
+
+        .carousel-row { display: flex; align-items: center; gap: 18px; }
+        .carousel-arrow {
+            width: 46px; height: 46px; border-radius: 50%; flex-shrink: 0;
+            border: 1px solid var(--line-strong); background: var(--surface); color: var(--text);
+            cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center;
+            transition: all .2s;
+        }
+        .carousel-arrow:hover { border-color: var(--accent); color: var(--accent); background: rgba(191,162,103,0.08); }
+        .carousel-stage { flex: 1; overflow: hidden; }
+        .carousel-panel { display: none; align-items: center; gap: 34px; }
+        .carousel-panel.on { display: flex; animation: fadeSlide .4s ease; }
+        @keyframes fadeSlide { from { opacity: 0; transform: translateX(18px); } to { opacity: 1; transform: translateX(0); } }
+
+        .phone-shell {
+            flex-shrink: 0; width: 280px;
+            border: 1px solid var(--line); border-radius: 22px; overflow: hidden;
+            background: var(--bg);
+        }
+        .phone-top { display: flex; gap: 6px; padding: 14px 18px 10px; }
+        .phone-top i { width: 10px; height: 10px; border-radius: 50%; background: rgba(244,239,226,0.18); display: block; }
+        .phone-top i:nth-child(1) { background: rgba(255,95,87,0.65); }
+        .phone-top i:nth-child(2) { background: rgba(255,189,46,0.65); }
+        .phone-top i:nth-child(3) { background: rgba(39,201,63,0.65); }
+        .phone-img img { display: block; width: 100%; height: auto; }
+        .panel-info { flex: 1; min-width: 0; }
+        .panel-info .rnd { font-size: 0.72rem; font-weight: 700; color: var(--accent); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 6px; display: block; }
+        .panel-info h3 { font-family: var(--font-heading); font-size: 18px; font-weight: 600; color: var(--text); margin: 0 0 8px; }
+        .panel-info p { color: var(--muted); margin: 0; line-height: 1.7; }
+
+        .carousel-dots { display: flex; justify-content: center; gap: 8px; margin-top: 28px; }
+        .carousel-dot { width: 8px; height: 8px; border-radius: 50%; border: 1px solid var(--line-strong); background: transparent; cursor: pointer; padding: 0; transition: all .2s; }
+        .carousel-dot.on { background: var(--accent); border-color: var(--accent); }
+
+        /* ===== 开发投入 ===== */
+        .invest-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .invest-card {
+            background: var(--surface); border: 1px solid var(--line);
+            border-radius: var(--radius); padding: 30px;
+        }
+        .invest-card .card-tag { font-size: 0.72rem; font-weight: 700; color: var(--accent); letter-spacing: .1em; text-transform: uppercase; }
+        .invest-card h3 { font-family: var(--font-heading); font-size: 18px; font-weight: 600; color: var(--text); margin: 8px 0 16px; }
+        .invest-card p { color: var(--muted); font-size: 0.95rem; line-height: 1.7; margin: 0 0 12px; }
+        .invest-card p strong { color: var(--text); }
+
+        .bar-group { margin: 18px 0 10px; }
+        .bar-row { margin-bottom: 12px; }
+        .bar-head { display: flex; justify-content: space-between; font-size: 0.82rem; margin-bottom: 5px; }
+        .bar-head span { color: var(--muted); } .bar-head b { font-weight: 600; color: var(--text); }
+        .bar-track { height: 8px; background: rgba(244,239,226,0.05); border-radius: 4px; overflow: hidden; }
+        .bar-fill { height: 100%; border-radius: 4px; }
+        .bar-fill.in { background: var(--accent); }
+        .bar-fill.out { background: var(--accent-green); }
+        .bar-fill.all { background: var(--accent-blue); }
+        .bar-note { font-size: 0.82rem; color: var(--muted); margin: 0; }
+
+        .pit-list { color: var(--muted); font-size: 0.9rem; line-height: 1.8; padding-left: 20px; margin: 0; }
+        .pit-list li { margin-bottom: 6px; }
+        .pit-list code { background: rgba(244,239,226,0.05); padding: 2px 6px; border-radius: 4px; font-size: .9em; }
+
+        /* ===== CTA ===== */
+        .cta-box {
+            background: var(--surface); border: 1px solid var(--line-strong);
+            border-radius: var(--radius); padding: 52px 40px; text-align: center;
+        }
+        .cta-box h2 { font-family: var(--font-heading); font-size: 22px; font-weight: 600; color: var(--accent); margin: 0 0 12px; }
+        .cta-box p { color: var(--muted); max-width: 580px; margin: 0 auto 16px; line-height: 1.7; }
+        .cta-box .hero-btns { justify-content: center; margin-top: 28px; margin-bottom: 0; }
+
+        @media (max-width: 860px) {
+            .meta-row { grid-template-columns: repeat(2, 1fr); }
+            .carousel-panel { flex-direction: column; align-items: flex-start; gap: 20px; }
+            .phone-shell { width: 220px; }
+        }
+        @media (max-width: 640px) {
+            .article-page { padding: 24px 16px 56px; }
+            .meta-row { grid-template-columns: 1fr; }
+            .invest-grid { grid-template-columns: 1fr; }
+            .carousel-arrow { display: none; }
+        }
+    </style>
+</head>
+
+<body>
+    <span id="top" class="top-anchor" aria-hidden="true"></span>
+    <div class="page-shell">
+        <header class="site-header">
+            <a class="brand" href="../index.html" aria-label="回到主页">
+                <img src="../assets/avatar.jpg" alt="郭猛 Ammon" class="brand-avatar" width="34" height="34">
+                <span>郭猛 Ammon</span>
+            </a>
+            <nav class="desktop-nav" aria-label="主导航">
+                <a href="../index.html">主页</a>
+                <a href="../api-hub.html">API 聚合导航</a>
+                <a href="../index.html#ai-explore">AI 探索</a>
+                <a href="../index.html#articles">文章分享</a>
+            </nav>
+            <div class="header-actions">
+                <button class="menu-toggle" type="button" data-menu-toggle aria-label="打开菜单" aria-controls="mobile-menu"
+                    aria-expanded="false">
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </header>
+
+        <div class="mobile-menu" id="mobile-menu" data-mobile-menu>
+            <a href="../index.html">主页</a>
+            <a href="../api-hub.html">API 聚合导航</a>
+            <a href="../index.html#ai-explore">AI 探索</a>
+            <a href="../index.html#articles">文章分享</a>
+        </div>
+
+        <main>
+            <article class="article-page">
+
+                <!-- ===== Hero ===== -->
+                <div class="hero-block reveal">
+                    <span class="sec-label">OPENCLAW SKILL</span>
+                    <h1>easy-openclaw</h1>
+                    <p class="hero-sub">
+                        不用手改 JSON，不用记命令，把常用优化、渠道接入和 Skill 安装一次走完。
+                        只要跟你的小龙虾说：请从 <code>https://github.com/daheiai/easy-openclaw</code> 安装并启用这个 skill。
+                    </p>
+                    <div class="hero-btns">
+                        <a class="btn-primary" href="https://clawhub.ai/daheiai/easy-openclaw" target="_blank" rel="noreferrer">在 ClawHub 查看</a>
+                        <a class="btn-secondary" href="https://github.com/daheiai/easy-openclaw" target="_blank" rel="noreferrer">查看源码</a>
+                    </div>
+
+                    <div class="meta-row reveal">
+                        <div class="meta-item">
+                            <span class="meta-title">基础优化</span>
+                            <span class="meta-desc">流式消息、记忆功能、消息回执、联网搜索、权限模式</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-title">渠道增强</span>
+                            <span class="meta-desc">Discord 免艾特响应、飞书缓存优化，补齐高危 Exec 审批</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-title">Skills 扩展</span>
+                            <span class="meta-desc">安全防御矩阵、Youtube Clipper、Agent Reach 等常用能力</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-title">渠道扩展</span>
+                            <span class="meta-desc">Discord、Telegram、Feishu 的详细接入与配置教程</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== 流程预览 ===== -->
+                <div class="block reveal">
+                    <div class="block-head">
+                        <span class="sec-label">流程预览</span>
+                        <h2>像滑动对话截图一样，看完整个配置过程</h2>
+                        <p>中间是当前主画面，左右保留前后轮次预览。4 轮对话即可完成全部设置。</p>
+                    </div>
+
+                    <div class="carousel-tabs" role="tablist">
+                        <button class="carousel-tab on" type="button" data-slide="0">第 1 轮</button>
+                        <button class="carousel-tab" type="button" data-slide="1">第 2 轮</button>
+                        <button class="carousel-tab" type="button" data-slide="2">第 3 轮</button>
+                        <button class="carousel-tab" type="button" data-slide="3">第 4 轮</button>
+                    </div>
+
+                    <div class="carousel-row" aria-live="polite">
+                        <button class="carousel-arrow carousel-prev" type="button" aria-label="上一张">←</button>
+                        <div class="carousel-stage">
+                            <div class="carousel-panel on" data-index="0">
+                                <div class="phone-shell">
+                                    <div class="phone-top"><i></i><i></i><i></i></div>
+                                    <div class="phone-img"><img src="images/easy-openclaw/1.jpg" alt="第 1 轮截图"></div>
+                                </div>
+                                <div class="panel-info">
+                                    <span class="rnd">Round 01</span>
+                                    <h3>先把最常用的 5 项配置一口气问完</h3>
+                                    <p>流式消息、记忆功能、消息回执、联网搜索、权限模式，先收集选择，再统一执行。</p>
+                                </div>
+                            </div>
+                            <div class="carousel-panel" data-index="1">
+                                <div class="phone-shell">
+                                    <div class="phone-top"><i></i><i></i><i></i></div>
+                                    <div class="phone-img"><img src="images/easy-openclaw/2.jpg" alt="第 2 轮截图"></div>
+                                </div>
+                                <div class="panel-info">
+                                    <span class="rnd">Round 02</span>
+                                    <h3>按当前渠道补强，而不是让用户自己翻配置</h3>
+                                    <p>Discord、Telegram、Feishu 分支按需提问，高危 Exec 审批也在这一轮集中收集。</p>
+                                </div>
+                            </div>
+                            <div class="carousel-panel" data-index="2">
+                                <div class="phone-shell">
+                                    <div class="phone-top"><i></i><i></i><i></i></div>
+                                    <div class="phone-img"><img src="images/easy-openclaw/3.jpg" alt="第 3 轮截图"></div>
+                                </div>
+                                <div class="panel-info">
+                                    <span class="rnd">Round 03</span>
+                                    <h3>想扩展能力，直接点名安装</h3>
+                                    <p>从备份、互联网访问到安全防御矩阵，用户选几个就装几个，不再把系统默认清单混进来。</p>
+                                </div>
+                            </div>
+                            <div class="carousel-panel" data-index="3">
+                                <div class="phone-shell">
+                                    <div class="phone-top"><i></i><i></i><i></i></div>
+                                    <div class="phone-img"><img src="images/easy-openclaw/4.jpg" alt="第 4 轮截图"></div>
+                                </div>
+                                <div class="panel-info">
+                                    <span class="rnd">Round 04</span>
+                                    <h3>需要继续接 Discord、Telegram、Feishu，就把最后一轮走完</h3>
+                                    <p>按步骤拿回必要信息，最后统一写入配置并完成验收，不让用户来回跳上下文。</p>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="carousel-arrow carousel-next" type="button" aria-label="下一张">→</button>
+                    </div>
+
+                    <div class="carousel-dots">
+                        <button class="carousel-dot on" type="button" data-slide="0"></button>
+                        <button class="carousel-dot" type="button" data-slide="1"></button>
+                        <button class="carousel-dot" type="button" data-slide="2"></button>
+                        <button class="carousel-dot" type="button" data-slide="3"></button>
+                    </div>
+                </div>
+
+                <!-- ===== 开发投入 ===== -->
+                <div class="block reveal">
+                    <div class="block-head">
+                        <span class="sec-label">开发投入</span>
+                        <h2>多天反复测试打磨</h2>
+                    </div>
+
+                    <div class="invest-grid">
+                        <div class="invest-card">
+                            <span class="card-tag">投入</span>
+                            <h3>约 1.99 亿 Tokens</h3>
+                            <p>累计总 Token 约 <strong>199,457,331</strong>，高频反复测试、修正和收敛之后的总投入。</p>
+                            <div class="bar-group">
+                                <div class="bar-row">
+                                    <div class="bar-head"><span>Input</span><b>约 1800 万</b></div>
+                                    <div class="bar-track"><div class="bar-fill in" style="width: 90%;"></div></div>
+                                </div>
+                                <div class="bar-row">
+                                    <div class="bar-head"><span>Output</span><b>约 190 万</b></div>
+                                    <div class="bar-track"><div class="bar-fill out" style="width: 18%;"></div></div>
+                                </div>
+                                <div class="bar-row">
+                                    <div class="bar-head"><span>Total</span><b>约 1.99 亿</b></div>
+                                    <div class="bar-track"><div class="bar-fill all" style="width: 100%;"></div></div>
+                                </div>
+                            </div>
+                            <p class="bar-note">总费用约 <strong>$137.89</strong></p>
+                        </div>
+                        <div class="invest-card">
+                            <span class="card-tag">过程</span>
+                            <h3>来回踩了不少坑</h3>
+                            <ul class="pit-list">
+                                <li>第一层一开始越改越散，后来才重新收拢成固定 5 项</li>
+                                <li>备份最早想做"最小备份"，最后还是改成整包备份 <code>~/.openclaw/</code></li>
+                                <li>审批一度放错位置，还出现过"全都要批"或者"根本批不动"</li>
+                                <li>第三层最容易跑偏，模型会偷偷换成系统默认 Skills 列表</li>
+                                <li>真实测试里还出现过装错 Skill、乱装、执行完失联</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== CTA ===== -->
+                <div class="cta-box reveal">
+                    <span class="sec-label">开始使用</span>
+                    <h2>现在就从 ClawHub 安装 easy-openclaw</h2>
+                    <p>如果你想把 OpenClaw 的初始化流程变得更像"对话式安装向导"，这就是当前最直接的入口。</p>
+                    <p>一旦出现任何问题，你也可以从项目根目录找到整个 OpenClaw 的备份，解压覆盖后就能恢复原状。</p>
+                    <div class="hero-btns">
+                        <a class="btn-primary" href="https://clawhub.ai/daheiai/easy-openclaw" target="_blank" rel="noreferrer">打开 ClawHub</a>
+                        <a class="btn-secondary" href="https://github.com/daheiai/easy-openclaw" target="_blank" rel="noreferrer">阅读 GitHub 文档</a>
+                    </div>
+                </div>
+
+            </article>
+        </main>
+
+        <footer class="site-footer section">
+            <span>郭猛 Ammon</span>
+            <a href="#top">回到顶部</a>
+        </footer>
+    </div>
+
+    <script>
+        document.querySelector('[data-menu-toggle]')?.addEventListener('click', function (e) {
+            const open = document.body.classList.toggle('menu-open');
+            document.querySelector('[data-mobile-menu]')?.classList.toggle('active', open);
+            e.currentTarget.setAttribute('aria-expanded', String(open));
+            e.currentTarget.setAttribute('aria-label', open ? '关闭菜单' : '打开菜单');
+        });
+        document.querySelectorAll('#mobile-menu a').forEach(l => {
+            l.addEventListener('click', () => {
+                document.body.classList.remove('menu-open');
+                document.querySelector('[data-mobile-menu]')?.classList.remove('active');
+                const b = document.querySelector('[data-menu-toggle]');
+                if (b) { b.setAttribute('aria-expanded', 'false'); b.setAttribute('aria-label', '打开菜单'); }
+            });
+        });
+
+        // 轮播
+        (function () {
+            const panels = document.querySelectorAll('.carousel-panel');
+            const tabs = document.querySelectorAll('.carousel-tab');
+            const dots = document.querySelectorAll('.carousel-dot');
+            const prev = document.querySelector('.carousel-prev');
+            const next = document.querySelector('.carousel-next');
+            const total = panels.length;
+            let cur = 0;
+
+            function go(i) {
+                if (i < 0) i = total - 1;
+                if (i >= total) i = 0;
+                cur = i;
+                panels.forEach((p, n) => p.classList.toggle('on', n === cur));
+                tabs.forEach((t, n) => t.classList.toggle('on', n === cur));
+                dots.forEach((d, n) => d.classList.toggle('on', n === cur));
+            }
+            tabs.forEach(t => t.addEventListener('click', () => go(parseInt(t.dataset.slide))));
+            dots.forEach(d => d.addEventListener('click', () => go(parseInt(d.dataset.slide))));
+            prev?.addEventListener('click', () => go(cur - 1));
+            next?.addEventListener('click', () => go(cur + 1));
+            document.addEventListener('keydown', e => {
+                if (e.key === 'ArrowLeft') go(cur - 1);
+                if (e.key === 'ArrowRight') go(cur + 1);
+            });
+        })();
+
+        // 滚动动画
+        (function() {
+            if (!('IntersectionObserver' in window)) {
+                document.querySelectorAll('.reveal').forEach(function(el) { el.classList.add('visible'); });
+                return;
+            }
+            var observer = new IntersectionObserver(function(entries) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting) { entry.target.classList.add('visible'); observer.unobserve(entry.target); }
+                });
+            }, { threshold: 0.12 });
+            document.querySelectorAll('.reveal').forEach(function(el) { observer.observe(el); });
+        })();
+    </script>
+</body>
+
+</html>

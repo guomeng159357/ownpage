@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 生成读书笔记 — 提示词模板</title>
+    <meta name="description" content="学术级读书笔记生成助手提示词，支持逐章产出结构化 Markdown 笔记，精准提炼主题、论点、证据链与术语。">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../css/custom.css">
+    <style>
+        .article-page { max-width: 860px; margin: 0 auto; padding: 40px 24px 80px; }
+        .article-page .back-link {
+            display: inline-flex; align-items: center; gap: 6px;
+            color: var(--muted); text-decoration: none; font-size: 14px;
+            margin-bottom: 32px; transition: color .2s;
+        }
+        .article-page .back-link:hover { color: var(--accent); }
+        .article-header {
+            margin-bottom: 40px; padding-bottom: 32px;
+            border-bottom: 1px solid var(--line);
+        }
+        .article-header .article-badge {
+            display: inline-block; font-size: 12px; font-weight: 600;
+            color: var(--accent); background: rgba(191,162,103,0.12);
+            padding: 4px 12px; border-radius: 999px; margin-bottom: 12px; letter-spacing: .04em;
+        }
+        .article-header h1 {
+            font-family: var(--font-heading);
+            font-size: clamp(28px, 5vw, 40px); font-weight: 700;
+            color: var(--text); margin: 12px 0 16px;
+            line-height: 1.25; letter-spacing: -.01em;
+        }
+        .article-header .article-summary {
+            font-size: 17px; color: var(--muted); line-height: 1.7; max-width: 680px;
+        }
+        .article-body h2 {
+            font-family: var(--font-heading); font-size: 22px; font-weight: 600;
+            color: var(--accent); margin: 44px 0 16px; padding-top: 8px; letter-spacing: -.01em;
+        }
+        .article-body h3 {
+            font-family: var(--font-heading); font-size: 18px; font-weight: 600;
+            color: var(--text); margin: 28px 0 12px;
+        }
+        .article-body p { color: var(--soft); line-height: 1.78; margin: 0 0 16px; }
+        .article-body ul { color: var(--soft); line-height: 1.78; margin: 0 0 20px; padding-left: 20px; }
+        .article-body li { margin-bottom: 6px; }
+
+        .copy-section { margin-top: 28px; }
+        .copy-toolbar {
+            display: flex; align-items: center; justify-content: space-between;
+            background: var(--bg-soft); border: 1px solid var(--line); border-bottom: none;
+            border-radius: var(--radius) var(--radius) 0 0; padding: 10px 16px;
+        }
+        .copy-toolbar span {
+            font-size: 13px; color: var(--muted); font-weight: 600;
+        }
+        .copy-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(191,162,103,0.15); color: var(--accent);
+            border: 1px solid rgba(191,162,103,0.3); border-radius: 6px;
+            padding: 7px 16px; cursor: pointer; font-size: 13px; font-weight: 600;
+            font-family: var(--font-body); transition: all .2s; white-space: nowrap;
+        }
+        .copy-btn:hover { background: rgba(191,162,103,0.25); border-color: var(--accent); }
+        .copy-btn.copied { background: rgba(136,183,159,0.2); color: var(--accent-green); border-color: rgba(136,183,159,0.4); }
+
+        .prompt-block {
+            background: var(--bg-soft); border: 1px solid var(--line);
+            border-radius: 0 0 var(--radius) var(--radius);
+            padding: 24px; overflow-x: auto;
+            font-family: "SF Mono", "Fira Code", "Cascadia Code", monospace;
+            font-size: 13px; line-height: 1.75; color: var(--soft);
+            white-space: pre-wrap; word-break: break-word;
+            max-height: 60vh; overflow-y: auto;
+        }
+
+        .analysis-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 28px;
+        }
+        .analysis-card {
+            background: var(--surface); border: 1px solid var(--line);
+            border-radius: var(--radius); padding: 20px;
+        }
+        .analysis-card h4 {
+            font-family: var(--font-heading); font-size: 15px; font-weight: 600;
+            color: var(--accent); margin: 0 0 10px;
+        }
+        .analysis-card p { font-size: 14px; margin: 0; }
+
+        .article-footer {
+            margin-top: 56px; padding-top: 24px;
+            border-top: 1px solid var(--line); color: var(--muted); font-size: 14px;
+        }
+        .toast {
+            position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%);
+            background: var(--accent-green); color: #11110f; padding: 10px 24px;
+            border-radius: 999px; font-weight: 600; font-size: 14px;
+            z-index: 999; opacity: 0; transition: opacity .3s; pointer-events: none;
+        }
+        .toast.show { opacity: 1; }
+
+        @media (max-width: 640px) {
+            .article-page { padding: 24px 16px 56px; }
+            .article-header h1 { font-size: 24px; }
+            .article-body h2 { font-size: 19px; }
+            .analysis-grid { grid-template-columns: 1fr; }
+            .prompt-block { font-size: 11px; padding: 16px; }
+        }
+    </style>
+</head>
+
+<body>
+    <span id="top" class="top-anchor" aria-hidden="true"></span>
+    <div class="page-shell">
+        <header class="site-header">
+            <a class="brand" href="../index.html" aria-label="回到主页">
+                <img src="../assets/avatar.jpg" alt="郭猛 Ammon" class="brand-avatar" width="34" height="34">
+                <span>郭猛 Ammon</span>
+            </a>
+            <nav class="desktop-nav" aria-label="主导航">
+                <a href="../index.html">主页</a>
+                <a href="../api-hub.html">API 聚合导航</a>
+                <a href="../index.html#ai-explore">AI 探索</a>
+                <a href="../index.html#articles">文章分享</a>
+            </nav>
+            <div class="header-actions">
+                <button class="menu-toggle" type="button" data-menu-toggle aria-label="打开菜单" aria-controls="mobile-menu"
+                    aria-expanded="false">
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </header>
+
+        <div class="mobile-menu" id="mobile-menu" data-mobile-menu>
+            <a href="../index.html">主页</a>
+            <a href="../api-hub.html">API 聚合导航</a>
+            <a href="../index.html#ai-explore">AI 探索</a>
+            <a href="../index.html#articles">文章分享</a>
+        </div>
+
+        <main>
+            <article class="article-page">
+                <a class="back-link" href="../index.html#ai-explore">← 返回 AI 探索</a>
+
+                <div class="article-header">
+                    <span class="article-badge">提示词模板 · 学术工具</span>
+                    <h1>AI 生成读书笔记 — 提示词模板</h1>
+                    <p class="article-summary">
+                        一个学术级读书笔记生成助手提示词，可对指定书籍逐章产出结构化 Markdown 笔记，精准提炼主题、论点、证据链、启示与术语，并提供合规的原文摘引与可追溯标注。
+                    </p>
+                </div>
+
+                <div class="article-body">
+
+                    <h2>提示词功能概览</h2>
+                    <div class="analysis-grid">
+                        <div class="analysis-card">
+                            <h4>📖 内容分析</h4>
+                            <p>章节语义拆解、主题建模与 MECE 归纳、论证结构提炼、术语抽取与跨章对齐。</p>
+                        </div>
+                        <div class="analysis-card">
+                            <h4>📝 结构化输出</h4>
+                            <p>逐章生成统一模板的 Markdown 笔记，包含概述、关键内容、主要观点、启示、术语等。</p>
+                        </div>
+                        <div class="analysis-card">
+                            <h4>✅ 质量控制</h4>
+                            <p>事实一致性核对、版本 / 译本识别、引用限额与合规控制、术语统一。</p>
+                        </div>
+                        <div class="analysis-card">
+                            <h4>🎯 适用场景</h4>
+                            <p>研究者与学生、编辑与内容从业者、培训教学、系统化沉淀阅读成果。</p>
+                        </div>
+                    </div>
+
+                    <h2>使用方法</h2>
+                    <p>将下方提示词模块复制到 Claude、GPT 等 AI 助手中，附上书籍文本或章节内容，即可自动生成结构化读书笔记。各模块可独立使用，也可合并为完整提示词。</p>
+                    <!-- 完整版 -->
+                    <div class="copy-section">
+                        <div class="copy-toolbar">
+                            <span>📋 完整提示词（含所有模块）</span>
+                            <button class="copy-btn" id="copyBtn" onclick="copyFullPrompt()">📝 复制全文</button>
+                        </div>
+                        <pre class="prompt-block" id="promptText">#AI 实战 /prompt
+Role: 学术级读书笔记生成助手
+Profile
+language: 中文（简体）
+description: 面向指定书籍逐章产出结构化、可快速浏览的 Markdown 读书笔记；精准提炼主题、论点、证据链、启示与术语，提供可追溯标注与严格合规的原文摘引。
+background: 长期从事知识组织、学术编辑与技术写作，熟悉语义解析、长文档结构化与学术引用标准（GB/T 7714、APA、MLA），可处理不同版本与译本的对齐与页码映射。
+personality: 严谨克制、结构化思维、注重证据与一致性、语言简洁。
+expertise: 章节语义分析、主题建模与层次归纳、论证结构提炼、Markdown 排版规范、术语抽取与词汇统一、版权与学术规范。
+target_audience: 研究者与学生、编辑与内容从业者、培训与教学场景、希望系统化沉淀阅读成果的普通读者。
+
+Skills
+内容分析与结构化表达
+章节语义拆解: 识别小节 / 话题边界，建立层级大纲与主题映射。
+主题与要点归纳（MECE）: 提炼 2–4 个要点，避免重复与遗漏。
+论点与证据链提炼: 明确作者主张、支撑证据与推理路径。
+Markdown 规范输出: 统一标题层级、列表与引文标记，便于浏览与检索。
+质量控制与合规保障
+事实与一致性核对: 跨段校验观点、数据与术语的一致性与上下文准确性。
+版本 / 译本识别: 记录版式信息，支持页码 / 位置标注映射。
+版权合规控制: 原文引用限额与来源标注，必要时改为引用位置提示。
+术语统一与跨章对齐: 维护术语表与定义口径的一致性。
+
+Rules
+基本原则：
+客观忠实：准确反映作者观点与论证，不添加个人评论或外部立场。
+完整不冗余：覆盖章节关键信息，避免赘述，优先短句与要点化表达。
+结构一致：所有章节严格采用同一标题层级与字段顺序，便于跨章比较。
+可追溯性：在可能情况下为关键观点与引用标注页码 / 位置 / 小节信息。
+行为准则：
+输出模板（严格遵循以下 Markdown 结构；数量与字数要求为硬性约束）：
+文档元数据
+generated_time: [YYYY-MM-DD HH:MM:SS]
+generated_by: [AI 模型名称]
+book_title: [书名]
+author: [作者 / 译者]
+edition: [版本 / 年份 / 出版社]
+isbn: [ISBN]
+source_scope: [章节范围 / 页码说明]
+[第 x 章] [章节标题]
+generated_time: [YYYY-MM-DD HH:MM:SS]
+generated_by: [AI 模型名称]
+章节概述
+[2–3 句概述本章核心内容与目的]
+关键内容
+[主题 1]
+[要点]
+[要点]
+[主题 2]
+[要点]
+[要点]
+[主题 3]
+[要点]
+[要点]
+[视需要增减主题，单主题下列出 2–4 个要点]
+主要观点
+[观点 1]
+[观点 2]
+[观点 3]
+[观点 4]
+[观点 5]
+[可根据章节长度适度增减]
+结论与启示
+[本章结论要点 1]
+[本章结论要点 2]
+[2–3 条关键启示 / 应用建议]
+思考问题
+[开放性问题 1]
+[开放性问题 2]
+[开放性问题 3]
+[共 3–5 个，促进迁移与应用]
+重要引用
+[原文引用 1 —— 保持原貌，必要时附页码 / 位置]
+[原文引用 2 —— 保持原貌，必要时附页码 / 位置]
+[仅在章节确有代表性段落时添加]
+关键术语
+[术语 1]: [10–20 字简要解释]
+[术语 2]: [10–20 字简要解释]
+[术语 3]: [10–20 字简要解释]
+[覆盖核心概念，避免重复]
+数量与长度：章节概述≤3 句；每主题要点 2–4 条；主要观点优先列 5 条；思考问题 3–5 条；术语解释 10–20 字。
+语言与格式：使用简洁中文，统一标点与术语口径；所有标题按 # / ## / ### 层级；列表使用数字序号与短划线。
+标注规范：若用户提供页码 / 位置，则在"主要观点""重要引用"或关键要点后以圆括号附"p.xx"或"Loc.xx"。
+限制条件：
+不臆造内容：仅基于提供或可访问的书籍文本生成；未知处以 [信息缺失] 占位，避免推断。
+版权合规：除公共领域与用户明确授权外，单段原文引用不超过约 90 个汉字（或英文不超过 10 个连续词）；超限时改为"引用位置 + 自述概括"，并提示用户提供可引用摘录。
+观点边界：不得加入读者个人评价、外部资料或与章节无关的信息。
+隐私与敏感：不输出个人隐私数据与受限信息，不嵌入外链追踪代码或无关标识。
+
+Workflows
+目标: 为指定书籍的每个章节生成客观、结构统一、可追溯且可复用的读书笔记。
+步骤 1: 输入与范围确认 —— 识别书名 / 作者 / 版本 / 译者与章节范围；校验是否提供全文或章节文本；设定生成时间与模型名称；确认是否提供页码 / 位置信息与引用权限。
+步骤 2: 深读与结构化抽取 —— 通读章节，建立层级大纲；按"关键内容→主要观点→结论与启示→思考问题→重要引用→关键术语"的顺序提炼；为关键论点尝试记录出处位置。
+步骤 3: 生成与质检发布 —— 按模板输出 Markdown；逐项核对数量 / 长度 / 风格 / 标注与引用合规；跨章术语与口径对齐；提交最终版本。
+预期结果: 产出包含文档元数据与逐章笔记的 Markdown 文档；信息准确、结构清晰、便于快速浏览与后续检索 / 复用。
+
+Initialization
+作为 学术级读书笔记生成助手，你必须遵守上述 Rules，按照 Workflows 执行任务。</pre>
+                    </div>
+
+                    <figure style="margin:24px 0;border-radius:var(--radius);overflow:hidden;border:1px solid var(--line);background:var(--bg-soft);">
+                        <img src="images/reading-notes-demo.jpeg" alt="AI 生成读书笔记效果示例" loading="lazy" style="display:block;width:100%;height:auto;">
+                        <figcaption style="padding:10px 14px;font-size:13px;color:var(--muted);text-align:center;border-top:1px solid var(--line);">效果示例：使用该提示词生成的读书笔记输出</figcaption>
+                    </figure>
+
+                </div>
+
+                <div class="article-footer">
+                    <p>© 2026 郭猛 Ammon · 个人主页 · <a href="../index.html" style="color:var(--accent);">返回主页</a></p>
+                </div>
+            </article>
+        </main>
+
+        <footer class="site-footer section">
+            <span>郭猛 Ammon</span>
+            <a href="#top">回到顶部</a>
+        </footer>
+    </div>
+
+    <div class="toast" id="toast">✅ 已复制到剪贴板</div>
+
+    <script>
+        document.querySelector('[data-menu-toggle]')?.addEventListener('click', function (e) {
+            const open = document.body.classList.toggle('menu-open');
+            document.querySelector('[data-mobile-menu]')?.classList.toggle('active', open);
+            e.currentTarget.setAttribute('aria-expanded', String(open));
+            e.currentTarget.setAttribute('aria-label', open ? '关闭菜单' : '打开菜单');
+        });
+        document.querySelectorAll('#mobile-menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                document.body.classList.remove('menu-open');
+                document.querySelector('[data-mobile-menu]')?.classList.remove('active');
+                const btn = document.querySelector('[data-menu-toggle]');
+                if (btn) { btn.setAttribute('aria-expanded', 'false'); btn.setAttribute('aria-label', '打开菜单'); }
+            });
+        });
+
+        function doCopy(text, btn) {
+            const toast = document.getElementById('toast');
+            const orig = btn.textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                btn.textContent = '✅ 已复制';
+                btn.classList.add('copied');
+                toast.classList.add('show');
+                setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); toast.classList.remove('show'); }, 2000);
+            }).catch(() => {
+                const ta = document.createElement('textarea');
+                ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+                document.body.appendChild(ta); ta.select();
+                document.execCommand('copy'); document.body.removeChild(ta);
+                btn.textContent = '✅ 已复制';
+                btn.classList.add('copied');
+                toast.classList.add('show');
+                setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); toast.classList.remove('show'); }, 2000);
+            });
+        }
+
+        function copyBlock(blockId, btn) {
+            doCopy(document.getElementById(blockId).innerText, btn);
+        }
+
+        function copyFullPrompt() {
+            doCopy(document.getElementById('promptText').innerText, document.getElementById('copyBtn'));
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//private/tmp/lizuju.github.io/**)",
+      "Read(//tmp/lizuju.github.io/**)",
+      "Bash(mkdir -p /Users/ammon/Desktop/项目/个人主页/docs/css /Users/ammon/Desktop/项目/个人主页/docs/js /Users/ammon/Desktop/项目/个人主页/docs/assets)",
+      "Bash(pdfimages -list \"/Users/ammon/Desktop/项目/个人主页/docs/assets/Codex++：让你的 Codex 更强大的神器.pdf\")",
+      "Bash(pdftoppm -jpeg -r 200 \"/Users/ammon/Desktop/项目/个人主页/docs/assets/Codex++：让你的 Codex 更强大的神器.pdf\" page-hq)",
+      "Bash(rm -f page-*.ppm)",
+      "Bash(python3)",
+      "Bash(open /Users/ammon/Desktop/项目/个人主页/docs/index.html)",
+      "Bash(open /Users/ammon/Desktop/项目/个人主页/docs/articles/thought-partner-prompt.html)",
+      "Bash(open /Users/ammon/Desktop/项目/个人主页/docs/articles/reading-notes-prompt.html)",
+      "Bash(open /Users/ammon/Desktop/项目/个人主页/docs/test-feishu-embed.html)",
+      "WebFetch(domain:easy.daheiai.com)",
+      "Bash(open /Users/ammon/Desktop/项目/个人主页/docs/articles/easy-openclaw.html)"
+    ],
+    "additionalDirectories": [
+      "/Users/ammon/Desktop/项目/个人主页/docs"
+    ]
+  }
+}

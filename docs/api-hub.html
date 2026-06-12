@@ -1,0 +1,1321 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>API 聚合导航</title>
+<meta name="description" content="收录 AI 模型 API 中转/聚合服务、官方平台及工具资源，涵盖 OpenAI、Claude、Gemini 等主流模型。">
+<link rel="stylesheet" href="css/custom.css">
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=DM+Sans:wght@400;500;700&display=swap');
+    :root {
+      --bg: #11110f;
+      --bg-soft: #181815;
+      --surface: rgba(244,239,226,0.07);
+      --line: rgba(229,221,202,0.15);
+      --line-strong: rgba(229,221,202,0.28);
+      --text: #f4efe3;
+      --muted: #aaa393;
+      --soft: #d8d0be;
+      --accent: #bfa267;
+      --accent-blue: #aebfbd;
+      --accent-green: #88b79f;
+      --ink: #171713;
+      --radius: 8px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'DM Sans','Space Grotesk',-apple-system,sans-serif;
+      background: linear-gradient(90deg, rgba(244,239,226,0.026) 1px, transparent 1px) 0 0/96px 96px,
+                  linear-gradient(180deg, rgba(244,239,226,0.018) 1px, transparent 1px) 0 0/96px 96px,
+                  linear-gradient(135deg, #11110f 0%, #181815 48%, #0f100e 100%);
+      color: var(--text);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+    body::before {
+      content: ""; position: fixed; inset: 0; pointer-events: none; z-index: -1;
+      background: linear-gradient(180deg, rgba(17,17,15,0.1), rgba(17,17,15,0.8)),
+                  repeating-linear-gradient(135deg, transparent 0 17px, rgba(244,239,226,0.018) 17px 18px);
+    }
+    a { color: inherit; text-decoration: none; }
+    .page { max-width: 1180px; margin: 0 auto; padding: 24px 24px 64px; }
+    .page > header { display: flex; flex-direction: column; gap: 16px; margin-bottom: 40px; }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(191,162,103,0.1); color: var(--accent); border: 1px solid rgba(191,162,103,0.25);
+      padding: 8px 14px; border-radius: 999px; font-weight: 600; width: fit-content;
+      font-family: 'Space Grotesk',sans-serif; font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase;
+    }
+    h1 { font-family: 'Space Grotesk',sans-serif; font-size: clamp(28px,4vw,40px); margin: 0; font-weight: 700; }
+    .lead { margin: 0; color: var(--muted); max-width: 900px; line-height: 1.6; font-size: 16px; }
+    .stats-row { display: flex; flex-wrap: wrap; gap: 1px; margin-bottom: 36px; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+    .stat-card {
+      flex: 1; min-width: 160px; padding: 20px 24px; text-decoration: none;
+      background: rgba(244,239,226,0.045); text-align: center;
+      transition: .2s; cursor: pointer; color: inherit; display: block;
+    }
+    .stat-card:hover { background: rgba(191,162,103,0.1); }
+    .stat-num { font-family: 'Space Grotesk',sans-serif; font-size: clamp(32px,5vw,48px); font-weight: 700; color: var(--text); }
+    .stat-label { color: var(--muted); font-size: 14px; font-weight: 600; margin-top: 4px; }
+    .side-nav {
+      position: fixed; left: 20px; top: 50%; transform: translateY(-50%); z-index: 100;
+      background: rgba(24,24,21,0.95); border: 1px solid var(--line-strong); border-radius: 16px;
+      padding: 12px; display: flex; flex-direction: column; gap: 6px;
+      backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+    }
+    .side-nav a {
+      text-decoration: none; color: var(--muted); padding: 8px 10px; border-radius: 10px;
+      font-size: 13px; font-weight: 600; transition: .15s; white-space: nowrap;
+    }
+    .side-nav a:hover, .side-nav a.active { background: var(--surface); color: var(--text); }
+    .mobile-nav { display: none; position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(24,24,21,0.98); border-top: 1px solid var(--line); backdrop-filter: blur(18px); }
+    .mobile-nav-inner { display: flex; justify-content: space-around; padding: 8px 6px calc(8px + env(safe-area-inset-bottom)); }
+    .mobile-nav a { text-decoration: none; color: var(--muted); font-size: 11px; text-align: center; font-weight: 600; }
+    section { margin-top: 56px; }
+    .section-title {
+      margin: 0 0 8px 0; font-family: 'Space Grotesk',sans-serif;
+      font-size: clamp(22px,3vw,28px); display: flex; align-items: center; gap: 10px; color: var(--text);
+    }
+    .section-desc { color: var(--muted); font-size: 14px; margin: 0 0 24px 0; }
+    .sub-title {
+      margin: 40px 0 18px 0; font-family: 'Space Grotesk',sans-serif;
+      font-size: clamp(18px,2.5vw,22px); color: var(--text);
+      padding-bottom: 8px; border-bottom: 1px solid var(--line);
+    }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+    .card {
+      display: flex; flex-direction: column; gap: 10px; padding: 18px;
+      background: rgba(244,239,226,0.04); border-radius: var(--radius);
+      border: 1px solid var(--line); text-decoration: none; color: inherit;
+      transition: .2s; position: relative; overflow: hidden;
+    }
+    .card:hover {
+      transform: translateY(-3px); border-color: rgba(191,162,103,0.4);
+      background: rgba(244,239,226,0.08);
+    }
+    .card-header { display: flex; align-items: center; gap: 12px; }
+    .card-logo {
+      width: 44px; height: 44px; border-radius: 10px; flex-shrink: 0;
+      background: linear-gradient(135deg, rgba(191,162,103,0.2), rgba(191,162,103,0.08));
+      display: grid; place-items: center; font-weight: 700;
+      font-family: 'Space Grotesk',sans-serif; font-size: 18px; color: var(--accent);
+    }
+    .card-title { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+    .card-name { font-weight: 700; font-size: 15px; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text); }
+    .card-tag {
+      display: inline-flex; font-size: 10px; padding: 2px 7px; border-radius: 999px;
+      background: rgba(191,162,103,0.12); color: var(--accent); font-weight: 600; width: fit-content;
+    }
+    .card-tag.official { background: rgba(136,183,159,0.12); color: var(--accent-green); }
+    .card-tag.tool { background: rgba(174,191,189,0.12); color: var(--accent-blue); }
+    .card-tag.source { background: rgba(191,162,103,0.15); color: var(--accent); }
+    .card-desc { margin: 0; color: var(--muted); line-height: 1.5; font-size: 13px; }
+    .card-link { display: inline-flex; align-items: center; gap: 4px; margin-top: auto; font-size: 12px; color: var(--accent); font-weight: 600; }
+    .card-link-icon { font-size: 14px; }
+    @media (max-width: 1280px) { .side-nav { display: none; } .mobile-nav { display: block; } .page { padding-bottom: 88px; } }
+    @media (max-width: 720px) { .stats-row { flex-direction: column; } .grid { grid-template-columns: 1fr; } }
+    @media (max-width: 640px) { .page { padding: 36px 18px 96px; } }
+    .back-top {
+      position: fixed; right: 24px; bottom: 80px; z-index: 99;
+      width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line-strong);
+      background: rgba(24,24,21,0.9); cursor: pointer; font-size: 20px;
+      display: none; align-items: center; justify-content: center; color: var(--text);
+      backdrop-filter: blur(12px); transition: .2s;
+    }
+    .back-top:hover { transform: translateY(-2px); border-color: var(--accent); background: rgba(191,162,103,0.15); }
+    .back-top.show { display: flex; }
+    footer { color: var(--muted); }
+    footer strong { color: var(--soft); }
+
+</style>
+</head>
+<body>
+
+<!-- ===== 主导航栏 ===== -->
+<header class="site-header" style="z-index:200;">
+    <a class="brand" href="index.html" aria-label="回到主页">
+        <img src="assets/avatar.jpg" alt="郭猛 Ammon" class="brand-avatar" width="34" height="34">
+        <span>郭猛 Ammon</span>
+    </a>
+    <nav class="desktop-nav" aria-label="主导航">
+        <a href="index.html">主页</a>
+        <a href="api-hub.html" style="color:var(--accent);">API 聚合导航</a>
+        <a href="index.html#ai-explore">AI 探索</a>
+        <a href="index.html#articles">文章分享</a>
+    </nav>
+    <div class="header-actions">
+        <button class="menu-toggle" type="button" data-menu-toggle aria-label="打开菜单" aria-controls="mobile-menu" aria-expanded="false">
+            <span></span>
+            <span></span>
+        </button>
+    </div>
+</header>
+
+<div class="mobile-menu" id="mobile-menu" data-mobile-menu>
+    <a href="index.html">主页</a>
+    <a href="api-hub.html" style="color:var(--accent);">API 聚合导航</a>
+    <a href="index.html#ai-explore">AI 探索</a>
+    <a href="index.html#articles">文章分享</a>
+</div>
+
+
+<!-- ===== 页面内导航 ===== -->
+<nav class="side-nav" id="sideNav">
+  <a href="#official">🏢 官方平台</a>
+  <a href="#relay">🔄 第三方中转</a>
+  <a href="#tools">🛠️ 开源工具</a>
+  <a href="#clients">💻 客户端</a>
+</nav>
+
+<nav class="mobile-nav">
+  <div class="mobile-nav-inner">
+    <a href="#official">🏢 官方</a>
+    <a href="#relay">🔄 中转</a>
+    <a href="#tools">🛠️ 工具</a>
+    <a href="#clients">💻 客户端</a>
+  </div>
+</nav>
+
+<button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="回到顶部">⬆</button>
+
+<div class="page">
+  <header>
+    <span class="eyebrow">🔗 API 聚合导航 · 即点即用</span>
+    <h1>API 聚合导航</h1>
+    <p class="lead">本文档为内部员工参考使用，收录 AI 模型 API 中转/聚合服务、官方平台及工具资源。涵盖 OpenAI、Claude、Gemini、Qwen、DeepSeek 等主流模型，方便快速对比和选用。</p>
+  </header>
+
+  <div class="stats-row">
+    <a class="stat-card" href="#official"><div class="stat-num" id="countOfficial">-</div><div class="stat-label">🏢 官方平台</div></a>
+    <a class="stat-card" href="#relay"><div class="stat-num" id="countRelay">-</div><div class="stat-label">🔄 第三方中转</div></a>
+    <a class="stat-card" href="#tools"><div class="stat-num" id="countTools">-</div><div class="stat-label">🛠️ 开源工具</div></a>
+    <a class="stat-card" href="#clients"><div class="stat-num" id="countClients">-</div><div class="stat-label">💻 客户端</div></a>
+  </div>
+  <section id="official">
+    <h2 class="section-title">🏢 官方平台</h2>
+    <p class="section-desc">模型厂商直供，最稳定可靠，价格按官网标准。</p>
+    <h3 class="sub-title">🌍 海外厂商</h3>
+    <div class="grid">
+      <a class="card" href="https://platform.openai.com" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">O</div>
+          <div class="card-title">
+            <p class="card-name">OpenAI</p>
+            <span class="card-tag official">官方平台</span>
+          </div>
+        </div>
+        <p class="card-desc">GPT系列模型的官方API平台</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> platform.openai.com</span>
+      </a>
+      <a class="card" href="https://ai.google.dev" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">G</div>
+          <div class="card-title">
+            <p class="card-name">Google AI Studio</p>
+            <span class="card-tag official">官方平台</span>
+          </div>
+        </div>
+        <p class="card-desc">Gemini官方API平台</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> ai.google.dev</span>
+      </a>
+      <a class="card" href="https://console.anthropic.com" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">A</div>
+          <div class="card-title">
+            <p class="card-name">Anthropic</p>
+            <span class="card-tag official">官方平台</span>
+          </div>
+        </div>
+        <p class="card-desc">Claude系列模型官方API</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> console.anthropic.com</span>
+      </a>
+      <a class="card" href="https://cohere.com" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">C</div>
+          <div class="card-title">
+            <p class="card-name">Cohere</p>
+            <span class="card-tag official">官方平台</span>
+          </div>
+        </div>
+        <p class="card-desc">Cohere官方API平台</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> cohere.com</span>
+      </a>
+      <a class="card" href="https://x.ai" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">G</div>
+          <div class="card-title">
+            <p class="card-name">Grok (xAI)</p>
+            <span class="card-tag official">官方平台</span>
+          </div>
+        </div>
+        <p class="card-desc">xAI公司出品，设计为具有幽默感并能访问实时信息</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> x.ai</span>
+      </a>
+      <a class="card" href="https://www.perplexity.ai" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">P</div>
+          <div class="card-title">
+            <p class="card-name">Perplexity AI</p>
+            <span class="card-tag official">官方平台</span>
+          </div>
+        </div>
+        <p class="card-desc">对话式AI搜索引擎，提供带引用来源的准确答案</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> perplexity.ai</span>
+      </a>
+      <a class="card" href="https://groq.com/groqcloud" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">G</div>
+          <div class="card-title">
+            <p class="card-name">Groq Cloud</p>
+            <span class="card-tag official">官方平台</span>
+          </div>
+        </div>
+        <p class="card-desc">主打极高速LLM推理</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> groq.com</span>
+      </a>
+      <a class="card" href="https://inference.cerebras.ai" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">C</div>
+          <div class="card-title">
+            <p class="card-name">Cerebras</p>
+            <span class="card-tag official">官方平台</span>
+          </div>
+        </div>
+        <p class="card-desc">按token免费/限额LLM推理</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> inference.cerebras.ai</span>
+      </a>
+      <a class="card" href="https://huggingface.co/inference-api" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">H</div>
+          <div class="card-title">
+            <p class="card-name">Hugging Face</p>
+            <span class="card-tag official">官方平台</span>
+          </div>
+        </div>
+        <p class="card-desc">聚合多开源模型的Inference API</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> huggingface.co</span>
+      </a>
+      <a class="card" href="https://docs.github.com/github-models" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">G</div>
+          <div class="card-title">
+            <p class="card-name">GitHub Models</p>
+            <span class="card-tag official">官方平台</span>
+          </div>
+        </div>
+        <p class="card-desc">Azure托管的一批模型API</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> docs.github.com</span>
+      </a>
+    </div>
+    <h3 class="sub-title">🇨🇳 国内厂商</h3>
+    <div class="grid">
+      <a class="card" href="https://platform.deepseek.com" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">D</div>
+          <div class="card-title">
+            <p class="card-name">DeepSeek 官方API</p>
+            <span class="card-tag official">官方平台</span>
+          </div>
+        </div>
+        <p class="card-desc">DeepSeek官方API平台，输入¥4/M Tokens，输出¥16/M Tokens</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> platform.deepseek.com</span>
+      </a>
+      <a class="card" href="https://www.aliyun.com/product/bailian" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">阿</div>
+          <div class="card-title">
+            <p class="card-name">阿里云百炼</p>
+            <span class="card-tag official">官方平台</span>
+          </div>
+        </div>
+        <p class="card-desc">阿里云百炼平台，主要调用Qwen模型系列</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> aliyun.com</span>
+      </a>
+      <a class="card" href="https://www.volcengine.com/product/ark" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">火</div>
+          <div class="card-title">
+            <p class="card-name">火山引擎 Ark</p>
+            <span class="card-tag official">官方平台</span>
+          </div>
+        </div>
+        <p class="card-desc">字节跳动大模型服务平台</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> volcengine.com</span>
+      </a>
+      <a class="card" href="https://open.bigmodel.cn" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">智</div>
+          <div class="card-title">
+            <p class="card-name">智谱 GLM</p>
+            <span class="card-tag official">官方平台</span>
+          </div>
+        </div>
+        <p class="card-desc">智谱BigModel，提供GLM-4等模型</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> open.bigmodel.cn</span>
+      </a>
+      <a class="card" href="https://console.bce.baidu.com" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">百</div>
+          <div class="card-title">
+            <p class="card-name">百度智能云</p>
+            <span class="card-tag official">官方平台</span>
+          </div>
+        </div>
+        <p class="card-desc">百度智能云API平台，主要调用文心一言，价格实惠</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> console.bce.baidu.com</span>
+      </a>
+      <a class="card" href="https://cloud.tencent.com/product/hunyuan" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">腾</div>
+          <div class="card-title">
+            <p class="card-name">腾讯云混元</p>
+            <span class="card-tag official">官方平台</span>
+          </div>
+        </div>
+        <p class="card-desc">腾讯云混元大模型API平台，支持DeepSeek等多模型</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> cloud.tencent.com</span>
+      </a>
+      <a class="card" href="https://xinghuo.xfyun.cn" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">讯</div>
+          <div class="card-title">
+            <p class="card-name">讯飞星火</p>
+            <span class="card-tag official">官方平台</span>
+          </div>
+        </div>
+        <p class="card-desc">讯飞星火大模型API</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> xinghuo.xfyun.cn</span>
+      </a>
+      <a class="card" href="https://kimi.moonshot.cn" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">K</div>
+          <div class="card-title">
+            <p class="card-name">Kimi（月之暗面）</p>
+            <span class="card-tag official">官方平台</span>
+          </div>
+        </div>
+        <p class="card-desc">支持超长上下文，擅长长文本处理</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> kimi.moonshot.cn</span>
+      </a>
+      <a class="card" href="https://www.baichuan-ai.com" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">百</div>
+          <div class="card-title">
+            <p class="card-name">百川智能</p>
+            <span class="card-tag official">官方平台</span>
+          </div>
+        </div>
+        <p class="card-desc">百川智能开源大语言模型，专注中文领域</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> baichuan-ai.com</span>
+      </a>
+      <a class="card" href="https://modelscope.cn" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">魔</div>
+          <div class="card-title">
+            <p class="card-name">魔搭 ModelScope</p>
+            <span class="card-tag official">官方平台</span>
+          </div>
+        </div>
+        <p class="card-desc">阿里魔搭，聚合Qwen/DeepSeek等开源模型</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> modelscope.cn</span>
+      </a>
+      <a class="card" href="https://platform.minimaxi.com" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">M</div>
+          <div class="card-title">
+            <p class="card-name">MiniMax</p>
+            <span class="card-tag official">官方平台</span>
+          </div>
+        </div>
+        <p class="card-desc">MiniMax官方API平台，提供abab系列模型</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> platform.minimaxi.com</span>
+      </a>
+      <a class="card" href="https://techday.sensetime.com" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">商</div>
+          <div class="card-title">
+            <p class="card-name">商汤商量</p>
+            <span class="card-tag official">官方平台</span>
+          </div>
+        </div>
+        <p class="card-desc">商汤大模型API</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> sensetime.com</span>
+      </a>
+      <a class="card" href="https://tiangong.kunlun.com" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">昆</div>
+          <div class="card-title">
+            <p class="card-name">昆仑天工</p>
+            <span class="card-tag official">官方平台</span>
+          </div>
+        </div>
+        <p class="card-desc">昆仑万维天工大模型API</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> tiangong.kunlun.com</span>
+      </a>
+      <a class="card" href="https://www.scnet.cn" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">超</div>
+          <div class="card-title">
+            <p class="card-name">超算互联网</p>
+            <span class="card-tag official">官方平台</span>
+          </div>
+        </div>
+        <p class="card-desc">国家级大模型API平台，提供多种开源模型免费额度</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> scnet.cn</span>
+      </a>
+      <a class="card" href="https://training.xfyun.cn" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">讯</div>
+          <div class="card-title">
+            <p class="card-name">讯飞星辰 MaaS</p>
+            <span class="card-tag official">官方平台</span>
+          </div>
+        </div>
+        <p class="card-desc">支持Spark、Qwen、DeepSeek等模型</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> training.xfyun.cn</span>
+      </a>
+    </div>
+  </section>
+  <section id="relay">
+    <h2 class="section-title">🔄 第三方中转站</h2>
+    <p class="section-desc">非官方渠道，价格通常更便宜，但稳定性和安全性需自行评估。建议小额试用后再大规模接入。</p>
+    <h3 class="sub-title">🏆 贵且稳定类</h3>
+    <div class="grid">
+      <a class="card" href="https://api.gpt.ge" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">V</div>
+          <div class="card-title">
+            <p class="card-name">V-API</p>
+            <span class="card-tag">第三方</span>
+          </div>
+        </div>
+        <p class="card-desc">API老牌大站，支持的模型很多</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> api.gpt.ge</span>
+      </a>
+      <a class="card" href="https://www.aicodemirror.com" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">A</div>
+          <div class="card-title">
+            <p class="card-name">AICodeMirror</p>
+            <span class="card-tag">第三方</span>
+          </div>
+        </div>
+        <p class="card-desc">国内第一批老牌CC/CX/Gemini编程工具中转站，官方纯血渠道（有点小贵），第三方逆向渠道同步开放</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> aicodemirror.com</span>
+      </a>
+      <a class="card" href="https://aicodewith.com" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">A</div>
+          <div class="card-title">
+            <p class="card-name">AIcodewith</p>
+            <span class="card-tag">第三方</span>
+          </div>
+        </div>
+        <p class="card-desc">群友推荐比较稳定，能用Claude、OpenAI、Google的模型</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> aicodewith.com</span>
+      </a>
+      <a class="card" href="https://openrouter.ai" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">O</div>
+          <div class="card-title">
+            <p class="card-name">OpenRouter</p>
+            <span class="card-tag official">官方聚合</span>
+          </div>
+        </div>
+        <p class="card-desc">老牌多模型网关，模型上新速度最快，稳定性也最好，价格同价多收充值手续费算是最贵</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> openrouter.ai</span>
+      </a>
+      <a class="card" href="https://poixe.com" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">P</div>
+          <div class="card-title">
+            <p class="card-name">Poixe AI</p>
+            <span class="card-tag">第三方</span>
+          </div>
+        </div>
+        <p class="card-desc">从2024年开始运营，较老的中转站。风格独特，支持多模型。价格偏高但质量很好，完全不注水，速度快。可开票，适合企业用户。</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> poixe.com</span>
+      </a>
+      <a class="card" href="https://code0.ai" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">C</div>
+          <div class="card-title">
+            <p class="card-name">code0.ai</p>
+            <span class="card-tag">第三方</span>
+          </div>
+        </div>
+        <p class="card-desc">企业级大模型API聚合平台，一个Key全覆盖。直连Claude/GPT/Gemini，支持人民币结算，按量计费无月租。</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> code0.ai</span>
+      </a>
+      <a class="card" href="https://302.ai" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">3</div>
+          <div class="card-title">
+            <p class="card-name">302.AI</p>
+            <span class="card-tag">第三方</span>
+          </div>
+        </div>
+        <p class="card-desc">按用量付费的企业级AI资源平台，提供最新最全面的海内外模型API，一个Key切换任意模型，官方原价效果稳定。</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> 302.ai</span>
+      </a>
+      <a class="card" href="https://api2d.com" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">A</div>
+          <div class="card-title">
+            <p class="card-name">API2D</p>
+            <span class="card-tag">第三方</span>
+          </div>
+        </div>
+        <p class="card-desc">运营时间较长的国内中转站，用户基数大，支持OpenAI全模型。价格中等，稳定性良好，有专属客服。</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> api2d.com</span>
+      </a>
+    </div>
+    <h3 class="sub-title">💰 极致便宜类</h3>
+    <div class="grid">
+      <a class="card" href="https://anyaigc.com" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">A</div>
+          <div class="card-title">
+            <p class="card-name">AnyAIGC中转站</p>
+            <span class="card-tag">第三方</span>
+          </div>
+        </div>
+        <p class="card-desc">全网最稳定的官方企业级渠道，触达8个地区20万+客户，36个月稳定运营，承诺永久运营</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> anyaigc.com</span>
+      </a>
+      <a class="card" href="https://vip.123everything.com" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">小</div>
+          <div class="card-title">
+            <p class="card-name">小米API</p>
+            <span class="card-tag">第三方</span>
+          </div>
+        </div>
+        <p class="card-desc">除了文本模型，有特色的是视频和图片模型也比较全</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> vip.123everything.com</span>
+      </a>
+      <a class="card" href="https://deepkey.top" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">D</div>
+          <div class="card-title">
+            <p class="card-name">deepkey</p>
+            <span class="card-tag">第三方</span>
+          </div>
+        </div>
+        <p class="card-desc">超高性价比，超低定价倍率0.1，提供Claude/GPT/Gemini源头货源，小白友好</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> deepkey.top</span>
+      </a>
+      <a class="card" href="https://api.butcodex.com" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">B</div>
+          <div class="card-title">
+            <p class="card-name">Butcodex</p>
+            <span class="card-tag">第三方</span>
+          </div>
+        </div>
+        <p class="card-desc">专注GPT-5.4/5.5模型，价格0.1-0.8，随时可退款，成立时间：2026年2月</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> api.butcodex.com</span>
+      </a>
+      <a class="card" href="https://www.uocode.com" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">U</div>
+          <div class="card-title">
+            <p class="card-name">UoCode</p>
+            <span class="card-tag">第三方</span>
+          </div>
+        </div>
+        <p class="card-desc">主打Claude和Codex系列模型</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> uocode.com</span>
+      </a>
+      <a class="card" href="https://sub.chancexj.com" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">星</div>
+          <div class="card-title">
+            <p class="card-name">星链API</p>
+            <span class="card-tag">第三方</span>
+          </div>
+        </div>
+        <p class="card-desc">主打GPT模型，满血不掺水，按量付费0.2倍率，充值1:1，可开个人工作室发票</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> sub.chancexj.com</span>
+      </a>
+      <a class="card" href="https://yunwu.ai" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">云</div>
+          <div class="card-title">
+            <p class="card-name">云雾AI</p>
+            <span class="card-tag">第三方</span>
+          </div>
+        </div>
+        <p class="card-desc">老牌中转站，覆盖Claude/GPT/Gemini/DeepSeek/国产模型。上新模型快，面向企业，稳定性好，可开票。</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> yunwu.ai</span>
+      </a>
+      <a class="card" href="https://foxcode.rjj.cc" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">F</div>
+          <div class="card-title">
+            <p class="card-name">foxcode</p>
+            <span class="card-tag source">源头第三方</span>
+          </div>
+        </div>
+        <p class="card-desc">主打Claude的低价通道，写代码好用但部分是逆向接口，token消耗量比较快</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> foxcode.rjj.cc</span>
+      </a>
+      <a class="card" href="https://api.e2ez.com" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">E</div>
+          <div class="card-title">
+            <p class="card-name">E2 API</p>
+            <span class="card-tag">第三方</span>
+          </div>
+        </div>
+        <p class="card-desc">1元=10刀，你就说偏不便宜吧</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> api.e2ez.com</span>
+      </a>
+      <a class="card" href="https://api.ekan8.com" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">E</div>
+          <div class="card-title">
+            <p class="card-name">Ekan8</p>
+            <span class="card-tag">第三方</span>
+          </div>
+        </div>
+        <p class="card-desc">只支持Claude Opus和Gemini。按次收费每次0.15元。是「酒馆」类站点里质量价格比最高的。</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> api.ekan8.com</span>
+      </a>
+      <a class="card" href="https://api.aipaibox.com" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">A</div>
+          <div class="card-title">
+            <p class="card-name">AI派</p>
+            <span class="card-tag">第三方</span>
+          </div>
+        </div>
+        <p class="card-desc">较新的网站，只支持Claude、GPT、Gemini。自营号池价格极低，质量不错。</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> api.aipaibox.com</span>
+      </a>
+    </div>
+    <h3 class="sub-title">✨ 小有特色类</h3>
+    <div class="grid">
+      <a class="card" href="https://aiberm.com" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">A</div>
+          <div class="card-title">
+            <p class="card-name">aiberm</p>
+            <span class="card-tag">第三方</span>
+          </div>
+        </div>
+        <p class="card-desc">运行几个月比较稳定，Claude系列模型统统1.9折</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> aiberm.com</span>
+      </a>
+      <a class="card" href="https://dashboard.x-aio.com" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">X</div>
+          <div class="card-title">
+            <p class="card-name">X-aio</p>
+            <span class="card-tag">第三方</span>
+          </div>
+        </div>
+        <p class="card-desc">自己建的服务器节点，跑的小参数开源模型比较多，最近也上了coding套餐</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> dashboard.x-aio.com</span>
+      </a>
+      <a class="card" href="https://marketplace.aisa.one" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">A</div>
+          <div class="card-title">
+            <p class="card-name">Alsa</p>
+            <span class="card-tag">第三方</span>
+          </div>
+        </div>
+        <p class="card-desc">不止AI的API，同时支持YouTube、推特、财经数据类API，非常之全</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> marketplace.aisa.one</span>
+      </a>
+      <a class="card" href="http://ai.wenmodel.com" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">W</div>
+          <div class="card-title">
+            <p class="card-name">WenModel</p>
+            <span class="card-tag">第三方</span>
+          </div>
+        </div>
+        <p class="card-desc">阿里出身团队，阿里云头部代理商，Qwen官方直连5折起，海外+国产模型覆盖6大厂商</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> ai.wenmodel.com</span>
+      </a>
+      <a class="card" href="https://www.right.codes" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">R</div>
+          <div class="card-title">
+            <p class="card-name">RightCode</p>
+            <span class="card-tag source">源头第三方</span>
+          </div>
+        </div>
+        <p class="card-desc">CODEX中最低价的中转站，只专注于Codex，适合预算有限的开发者</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> right.codes</span>
+      </a>
+      <a class="card" href="https://dgrid.ai" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">D</div>
+          <div class="card-title">
+            <p class="card-name">DGrid AI</p>
+            <span class="card-tag">第三方</span>
+          </div>
+        </div>
+        <p class="card-desc">去中心化的AI智能网络，为开发者提供低成本、可验证的模型与智能体调用服务</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> dgrid.ai</span>
+      </a>
+      <a class="card" href="https://www.mnapi.com" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">M</div>
+          <div class="card-title">
+            <p class="card-name">MNAPI</p>
+            <span class="card-tag">第三方</span>
+          </div>
+        </div>
+        <p class="card-desc">聚合多家中转站的二道中转，主打代挑高性价比渠道和质量监测</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> mnapi.com</span>
+      </a>
+      <a class="card" href="https://console.claudeapi.com" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">C</div>
+          <div class="card-title">
+            <p class="card-name">claudeapi.com</p>
+            <span class="card-tag">第三方</span>
+          </div>
+        </div>
+        <p class="card-desc">Claude API专属中转，稳定直连Anthropic官方模型，国内直连、人民币充值，Claude Code一键接入</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> console.claudeapi.com</span>
+      </a>
+    </div>
+    <h3 class="sub-title">📦 其他优质中转站</h3>
+    <div class="grid">
+      <a class="card" href="https://www.ohmygpt.com" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">O</div>
+          <div class="card-title">
+            <p class="card-name">OhMyGpt</p>
+            <span class="card-tag official">官方聚合</span>
+          </div>
+        </div>
+        <p class="card-desc">社区认可的"正经中转"，接入体验好效果也超级稳，收费就是原价</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> ohmygpt.com</span>
+      </a>
+      <a class="card" href="https://jiekou.ai" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">接</div>
+          <div class="card-title">
+            <p class="card-name">接口AI</p>
+            <span class="card-tag">第三方</span>
+          </div>
+        </div>
+        <p class="card-desc">主打官方API，具备99.9%可用性，全天候运行支持。同时支持逆向渠道（明确标注）</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> jiekou.ai</span>
+      </a>
+      <a class="card" href="https://nexus-xi.com" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">N</div>
+          <div class="card-title">
+            <p class="card-name">NEXUS AI</p>
+            <span class="card-tag">第三方</span>
+          </div>
+        </div>
+        <p class="card-desc">一站式AI API中转服务平台，已接入DeepSeek V4系列模型，国内可用，无需海外信用卡</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> nexus-xi.com</span>
+      </a>
+      <a class="card" href="https://www.qqqrouter.ai" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">Q</div>
+          <div class="card-title">
+            <p class="card-name">QQQRouter</p>
+            <span class="card-tag">第三方</span>
+          </div>
+        </div>
+        <p class="card-desc">小白和个人用户有性价比超高的套餐；企业和开发者则有高性能高稳定性的专业API</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> qqqrouter.ai</span>
+      </a>
+      <a class="card" href="https://ms.ll9e.cn" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">猫</div>
+          <div class="card-title">
+            <p class="card-name">猫叔API</p>
+            <span class="card-tag">第三方</span>
+          </div>
+        </div>
+        <p class="card-desc">支持模型很多，覆盖Claude/GPT/Gemini。上新模型快，面向企业，稳定性好，可开票</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> ms.ll9e.cn</span>
+      </a>
+      <a class="card" href="https://api.yousebaby.com" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">鸡</div>
+          <div class="card-title">
+            <p class="card-name">鸡哥API</p>
+            <span class="card-tag">第三方</span>
+          </div>
+        </div>
+        <p class="card-desc">酒馆用户中较常见。支持Claude/Gemini/DeepSeek/Minimax。按次计费，质量不错不注水</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> api.yousebaby.com</span>
+      </a>
+      <a class="card" href="https://chatanywhere.tech" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">C</div>
+          <div class="card-title">
+            <p class="card-name">ChatAnywhere</p>
+            <span class="card-tag">第三方</span>
+          </div>
+        </div>
+        <p class="card-desc">价格竞争力强，GPT-4o mini和DeepSeek V3价格较低。支持国内支付宝付款</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> chatanywhere.tech</span>
+      </a>
+      <a class="card" href="https://www.last-api.ai" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">L</div>
+          <div class="card-title">
+            <p class="card-name">LAST API</p>
+            <span class="card-tag">第三方</span>
+          </div>
+        </div>
+        <p class="card-desc">提供企业级API调用，SLA长期稳定，主推Claude Code/Codex AI编程模型，可定制号池</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> last-api.ai</span>
+      </a>
+      <a class="card" href="https://api.holdai.top" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">毫</div>
+          <div class="card-title">
+            <p class="card-name">毫秒API</p>
+            <span class="card-tag">第三方</span>
+          </div>
+        </div>
+        <p class="card-desc">官key直连，支持高并发。运行了快一年了</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> api.holdai.top</span>
+      </a>
+      <a class="card" href="https://www.moxin.studio" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">墨</div>
+          <div class="card-title">
+            <p class="card-name">墨信AI</p>
+            <span class="card-tag">第三方</span>
+          </div>
+        </div>
+        <p class="card-desc">实体企业运行有淘宝旗舰店，可开发票，主做国外模型Gemini/Claude等</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> moxin.studio</span>
+      </a>
+      <a class="card" href="https://aihubmix.com" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">A</div>
+          <div class="card-title">
+            <p class="card-name">AIHUBMIX</p>
+            <span class="card-tag">第三方</span>
+          </div>
+        </div>
+        <p class="card-desc">美国公司背景、有云服务商授权，模型全价格接近官网，也支持了Claude Code</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> aihubmix.com</span>
+      </a>
+      <a class="card" href="https://api.tu-zi.com" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">兔</div>
+          <div class="card-title">
+            <p class="card-name">兔子API</p>
+            <span class="card-tag">第三方</span>
+          </div>
+        </div>
+        <p class="card-desc">推荐的人很多，推特很活跃，有自己的技术开发，选择也比较多样</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> api.tu-zi.com</span>
+      </a>
+      <a class="card" href="https://api.laozhang.ai" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">老</div>
+          <div class="card-title">
+            <p class="card-name">老张API</p>
+            <span class="card-tag">第三方</span>
+          </div>
+        </div>
+        <p class="card-desc">国内热门中转，折扣价有吸引力，主要稳定的是Claude</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> api.laozhang.ai</span>
+      </a>
+      <a class="card" href="https://api.bltcy.ai" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">B</div>
+          <div class="card-title">
+            <p class="card-name">bltcy</p>
+            <span class="card-tag">第三方</span>
+          </div>
+        </div>
+        <p class="card-desc">AZ+官转双路线，成功率九成左右稳定性不错，适合扛部分主力流量</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> api.bltcy.ai</span>
+      </a>
+      <a class="card" href="https://api.v3.cm" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">V</div>
+          <div class="card-title">
+            <p class="card-name">v3</p>
+            <span class="card-tag">第三方</span>
+          </div>
+        </div>
+        <p class="card-desc">模型超全的一站式中转，选择多上手简单，适合喜欢折腾多模型的开发者</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> api.v3.cm</span>
+      </a>
+      <a class="card" href="https://api.chatfire.cn" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">C</div>
+          <div class="card-title">
+            <p class="card-name">chatfire</p>
+            <span class="card-tag">第三方</span>
+          </div>
+        </div>
+        <p class="card-desc">源头服务商定位，支持多模态，Claude可用性高</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> api.chatfire.cn</span>
+      </a>
+      <a class="card" href="https://www.hvoy.ai" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">柏</div>
+          <div class="card-title">
+            <p class="card-name">柏拉图AI</p>
+            <span class="card-tag">第三方</span>
+          </div>
+        </div>
+        <p class="card-desc">比较老的API站，支持市面上几乎所有模型，含MJ/可灵/豆包等。多地区节点，可开票</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> hvoy.ai</span>
+      </a>
+      <a class="card" href="https://one.ooo.cool" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">O</div>
+          <div class="card-title">
+            <p class="card-name">ocoolAPI</p>
+            <span class="card-tag">第三方</span>
+          </div>
+        </div>
+        <p class="card-desc">文档详细适合小白，模型覆盖全</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> one.ooo.cool</span>
+      </a>
+      <a class="card" href="https://gptgod.cloud" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">G</div>
+          <div class="card-title">
+            <p class="card-name">gptgod</p>
+            <span class="card-tag">第三方</span>
+          </div>
+        </div>
+        <p class="card-desc">官方+逆向混合路由，性价比高，适合当主力之一</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> gptgod.cloud</span>
+      </a>
+      <a class="card" href="https://timicc.com" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">T</div>
+          <div class="card-title">
+            <p class="card-name">TimiCC</p>
+            <span class="card-tag">第三方</span>
+          </div>
+        </div>
+        <p class="card-desc">2026年1月成立，为编程准备。GPT team号基本免费，注册送1元</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> timicc.com</span>
+      </a>
+      <a class="card" href="https://sg.uiuiapi.com" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">U</div>
+          <div class="card-title">
+            <p class="card-name">UIUIAPI</p>
+            <span class="card-tag">第三方</span>
+          </div>
+        </div>
+        <p class="card-desc">国内用户友好的聚合平台，支付方式方便</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> sg.uiuiapi.com</span>
+      </a>
+      <a class="card" href="https://api.zetatechs.com" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">Z</div>
+          <div class="card-title">
+            <p class="card-name">ZetaTechs API</p>
+            <span class="card-tag">第三方</span>
+          </div>
+        </div>
+        <p class="card-desc">Grok接口，速度挺快</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> api.zetatechs.com</span>
+      </a>
+      <a class="card" href="https://api.ikuncode.cc" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">I</div>
+          <div class="card-title">
+            <p class="card-name">IkunCode</p>
+            <span class="card-tag">第三方</span>
+          </div>
+        </div>
+        <p class="card-desc">编程专用API中转平台，提供稳定的模型接入</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> api.ikuncode.cc</span>
+      </a>
+      <a class="card" href="https://aispeed.ai" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">A</div>
+          <div class="card-title">
+            <p class="card-name">AIspeed</p>
+            <span class="card-tag">第三方</span>
+          </div>
+        </div>
+        <p class="card-desc">只卖Codex的中转站</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> aispeed.ai</span>
+      </a>
+      <a class="card" href="https://cloud.siliconflow.cn" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">硅</div>
+          <div class="card-title">
+            <p class="card-name">硅基流动</p>
+            <span class="card-tag">第三方</span>
+          </div>
+        </div>
+        <p class="card-desc">偏企业级的大模型推理与API平台，强调稳定性与高可用</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> cloud.siliconflow.cn</span>
+      </a>
+      <a class="card" href="https://ai.071129.xyz" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">0</div>
+          <div class="card-title">
+            <p class="card-name">071129</p>
+            <span class="card-tag">第三方</span>
+          </div>
+        </div>
+        <p class="card-desc">公益站，GitHub登录即可使用</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> ai.071129.xyz</span>
+      </a>
+    </div>
+  </section>
+  <section id="tools">
+    <h2 class="section-title">🛠️ 开源工具</h2>
+    <p class="section-desc">可自行部署的API管理/中转工具。</p>
+    <h3 class="sub-title">核心工具</h3>
+    <div class="grid">
+      <a class="card" href="https://github.com/QuantumNous/new-api" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">N</div>
+          <div class="card-title">
+            <p class="card-name">New API</p>
+            <span class="card-tag tool">开源项目</span>
+          </div>
+        </div>
+        <p class="card-desc">🔥 基于One API二次开发的新一代AI模型聚合管理系统，支持在线充值、多语言、现代化UI，7.5K+ Star</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> github.com</span>
+      </a>
+      <a class="card" href="https://github.com/songquanpeng/one-api" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">O</div>
+          <div class="card-title">
+            <p class="card-name">One API</p>
+            <span class="card-tag tool">开源项目</span>
+          </div>
+        </div>
+        <p class="card-desc">LLM API管理&分发系统，支持多种主流模型统一API适配，24.2K+ Star，被大量中转站用作底层</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> github.com</span>
+      </a>
+      <a class="card" href="https://github.com/popjane/v-api" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">V</div>
+          <div class="card-title">
+            <p class="card-name">v-api</p>
+            <span class="card-tag tool">开源项目</span>
+          </div>
+        </div>
+        <p class="card-desc">基于One-API二开的功能强大的中转平台，增强了后台管理功能</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> github.com</span>
+      </a>
+      <a class="card" href="https://github.com/fxaxg/one-api-hub" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">O</div>
+          <div class="card-title">
+            <p class="card-name">One API Hub</p>
+            <span class="card-tag tool">开源项目</span>
+          </div>
+        </div>
+        <p class="card-desc">开源浏览器插件，聚合管理基于One-API和New-API的中转站账号余额、模型和密钥</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> github.com</span>
+      </a>
+      <a class="card" href="https://github.com/gcloudream/claude-code-switch" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">C</div>
+          <div class="card-title">
+            <p class="card-name">claude-code-switch</p>
+            <span class="card-tag tool">开源项目</span>
+          </div>
+        </div>
+        <p class="card-desc">Claude Code中转站服务端，实现密钥管理、用量统计和转发功能</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> github.com</span>
+      </a>
+      <a class="card" href="https://github.com/belingud/claudewarp" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">C</div>
+          <div class="card-title">
+            <p class="card-name">claudewarp</p>
+            <span class="card-tag tool">开源项目</span>
+          </div>
+        </div>
+        <p class="card-desc">Claude中转站管理工具(CLI+GUI)，一键切换环境变量</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> github.com</span>
+      </a>
+      <a class="card" href="https://github.com/farion1231/cc-switch" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">C</div>
+          <div class="card-title">
+            <p class="card-name">cc-switch</p>
+            <span class="card-tag tool">开源项目</span>
+          </div>
+        </div>
+        <p class="card-desc">针对Claude Code的API供应商切换软件，不用手动修改配置文件</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> github.com</span>
+      </a>
+    </div>
+  </section>
+  <section id="clients">
+    <h2 class="section-title">💻 客户端工具</h2>
+    <p class="section-desc">兼容各种API的桌面/网页客户端。</p>
+    <h3 class="sub-title">推荐客户端</h3>
+    <div class="grid">
+      <a class="card" href="https://ollama.com" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">O</div>
+          <div class="card-title">
+            <p class="card-name">Ollama</p>
+            <span class="card-tag tool">客户端</span>
+          </div>
+        </div>
+        <p class="card-desc">本地大模型运行工具，支持Llama/Qwen/DeepSeek等开源模型一键部署，无需联网，适合开发调试</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> ollama.com</span>
+      </a>
+      <a class="card" href="https://chatboxai.app/zh" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">C</div>
+          <div class="card-title">
+            <p class="card-name">ChatBox</p>
+            <span class="card-tag tool">客户端</span>
+          </div>
+        </div>
+        <p class="card-desc">支持Windows、Android、macOS、网页版，免费使用，兼容各种API</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> chatboxai.app</span>
+      </a>
+      <a class="card" href="https://workbuddy.tencent.com" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">W</div>
+          <div class="card-title">
+            <p class="card-name">WorkBuddy</p>
+            <span class="card-tag tool">客户端</span>
+          </div>
+        </div>
+        <p class="card-desc">腾讯云出品的AI桌面智能体，支持自定义API Key接入，可操控电脑自主执行任务，与企业微信深度集成</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> workbuddy.tencent.com</span>
+      </a>
+      <a class="card" href="https://github.com/ChatGPTNextWeb/NextChat" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">N</div>
+          <div class="card-title">
+            <p class="card-name">NextChat</p>
+            <span class="card-tag tool">客户端</span>
+          </div>
+        </div>
+        <p class="card-desc">在线网页端开源WebUI，支持各种API接口，55.6K+ Star</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> github.com</span>
+      </a>
+      <a class="card" href="https://www.librechat.ai" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">L</div>
+          <div class="card-title">
+            <p class="card-name">LibreChat</p>
+            <span class="card-tag tool">客户端</span>
+          </div>
+        </div>
+        <p class="card-desc">在线网页端开源WebUI，支持各种API接口</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> librechat.ai</span>
+      </a>
+      <a class="card" href="https://cherry-ai.com" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">C</div>
+          <div class="card-title">
+            <p class="card-name">Cherry Studio</p>
+            <span class="card-tag tool">客户端</span>
+          </div>
+        </div>
+        <p class="card-desc">主打桌面端，兼容各种API，界面美观易用</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> cherry-ai.com</span>
+      </a>
+      <a class="card" href="https://github.com/lobehub/lobe-chat" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">L</div>
+          <div class="card-title">
+            <p class="card-name">LobeChat</p>
+            <span class="card-tag tool">客户端</span>
+          </div>
+        </div>
+        <p class="card-desc">开源高性能聊天机器人框架，支持语音合成、多模态、插件系统</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> github.com</span>
+      </a>
+      <a class="card" href="https://www.enconvo.com" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">E</div>
+          <div class="card-title">
+            <p class="card-name">EnConvo</p>
+            <span class="card-tag tool">客户端</span>
+          </div>
+        </div>
+        <p class="card-desc">专为macOS设计的AI客户端</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> enconvo.com</span>
+      </a>
+      <a class="card" href="https://github.com/ThinkInAIXYZ/deepchat" target="_blank" rel="noopener noreferrer">
+        <div class="card-header">
+          <div class="card-logo">D</div>
+          <div class="card-title">
+            <p class="card-name">DeepChat</p>
+            <span class="card-tag tool">客户端</span>
+          </div>
+        </div>
+        <p class="card-desc">飞速发展，界面酷炫，开源免费</p>
+        <span class="card-link"><span class="card-link-icon">↗</span> github.com</span>
+      </a>
+    </div>
+  </section>
+  <footer style="margin-top:64px;padding:32px 0;border-top:1px solid #e2e8f0;text-align:center;color:#64748b;font-size:14px;">
+    <p>📝 <strong>郭猛 Ammon</strong> · 仅供公司内部参考 · 更新日期：2026年6月</p>
+    <p style="font-size:12px;color:#94a3b8;">站点信息来源于社区搜集，排名不分先后。中转站状态可能变化，建议小额试用后再大规模接入。</p>
+  </footer>
+</div>
+
+<script>
+// 移动端菜单
+document.querySelector('[data-menu-toggle]')?.addEventListener('click', function(e) {
+    const open = document.body.classList.toggle('menu-open');
+    document.querySelector('[data-mobile-menu]')?.classList.toggle('active', open);
+    e.currentTarget.setAttribute('aria-expanded', String(open));
+    e.currentTarget.setAttribute('aria-label', open ? '关闭菜单' : '打开菜单');
+});
+document.querySelectorAll('#mobile-menu a').forEach(function(link) {
+    link.addEventListener('click', function() {
+        document.body.classList.remove('menu-open');
+        document.querySelector('[data-mobile-menu]')?.classList.remove('active');
+        var btn = document.querySelector('[data-menu-toggle]');
+        if (btn) { btn.setAttribute('aria-expanded', 'false'); btn.setAttribute('aria-label', '打开菜单'); }
+    });
+});
+
+document.getElementById('countOfficial').textContent = 25;
+document.getElementById('countRelay').textContent = 53;
+document.getElementById('countTools').textContent = 7;
+document.getElementById('countClients').textContent = 9;
+
+const sections = document.querySelectorAll('section');
+const navLinks = document.querySelectorAll('.side-nav a');
+const backTop = document.getElementById('backTop');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => { if (window.scrollY >= s.offsetTop - 200) current = s.id; });
+  navLinks.forEach(a => { a.classList.toggle('active', a.getAttribute('href') === '#' + current); });
+  backTop.classList.toggle('show', window.scrollY > 800);
+});
+document.querySelectorAll('.stat-num').forEach(el => {
+  const target = parseInt(el.textContent);
+  if (isNaN(target)) return;
+  let current = 0;
+  const step = Math.ceil(target / 40);
+  const timer = setInterval(() => {
+    current = Math.min(current + step, target);
+    el.textContent = current;
+    if (current >= target) clearInterval(timer);
+  }, 30);
+});
+</script>
+</body>
+</html>
